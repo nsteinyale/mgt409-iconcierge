@@ -383,6 +383,16 @@ SCHEMAS: dict[str, dict] = {
         "properties": {"query": {"type": "string", "description": "Keywords"}},
         "required": ["query"],
     },
+    "draft_email": {
+        "description": "Save an email or letter as a DRAFT for the family to review. It is never sent.",
+        "properties": {
+            "to": {"type": "string", "description": "Who it is for, e.g. 'Landlord (Elm Rentals)' or an address the family gave"},
+            "subject": {"type": "string"},
+            "body": {"type": "string", "description": "The full message, signed with the family's name or [Your name]"},
+            "purpose": {"type": "string", "description": "One line: why this message"},
+        },
+        "required": ["to", "subject", "body"],
+    },
     "get_family_profile": {"description": "The family's saved profile.", "properties": {}, "required": []},
     "list_family_documents": {"description": "Documents the family uploaded.", "properties": {}, "required": []},
     "read_family_document": {
@@ -405,6 +415,7 @@ FUNCTIONS: dict[str, Callable[..., dict]] = {
     "get_family_profile": get_family_profile,
     "list_family_documents": list_family_documents,
     "read_family_document": read_family_document,
+    "draft_email": lambda ctx, **_: {"error": "Drafts are saved by the team run."},
 }
 
 COMMON = ["search_official_sources", "get_family_profile", "list_family_documents", "read_family_document"]
@@ -415,6 +426,7 @@ TOOLSETS: dict[str, list[str]] = {
     "investor": COMMON + ["savings_growth", "emergency_fund", "loan_payoff"],
     "housing": COMMON + ["mortgage_payment", "home_affordability", "rent_vs_buy", "budget_split"],
     "benefits": COMMON + ["emergency_fund", "budget_split"],
+    "assistant": COMMON + ["draft_email"],
 }
 
 

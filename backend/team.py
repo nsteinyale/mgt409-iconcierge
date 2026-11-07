@@ -28,7 +28,12 @@ ROSTER: dict[str, dict] = {
     "benefits": {"name": "Grace", "role": "Insurance & Benefits Navigator",
                  "focus": "health, life, disability, home and renters insurance; government benefits such as "
                           "SNAP, Medicaid, Social Security, unemployment"},
+    "assistant": {"name": "Ari", "role": "My AI Assistant",
+                  "focus": "writing for the family: emails, letters, texts and replies to landlords, employers, "
+                           "insurers, agencies, schools and relatives, built on the team's findings. Drafts only: "
+                           "Ari saves drafts with draft_email and never sends anything"},
 }
+ASSISTANT = "assistant"
 
 CAPTAIN_STYLES = {
     "warm": "warm and reassuring, like a trusted family member who knows the right people",
@@ -82,7 +87,7 @@ class Run:
         self.blocked_tokens = safety.flagged_tokens(db.document_flags(self.family_id))
         self.known_numbers: set[float] = set()
         safety.collect_numbers(self.question, self.known_numbers)
-        safety.collect_numbers(self.profile, self.known_numbers)
+        self.known_numbers |= safety.profile_numbers(self.profile)
         self.events: list[dict] = []
         self.queue: asyncio.Queue = asyncio.Queue()
         self.usage = {"calls": 0, "prompt_tokens": 0, "cached_tokens": 0, "completion_tokens": 0, "cost": 0.0}
@@ -117,6 +122,17 @@ class Run:
         for f in findings:
             self.guard(f)
         return text
+
+    def save_draft(self, args: dict) -> dict:
+        """Ari's drafts pass the output guard before they are saved. Nothing is ever sent."""
+        to = self.clean(str(args.get("to") or "")[:200], "draft recipient").strip()
+        subject = self.clean(str(args.get("subject") or "")[:200], "draft subject").strip()
+        body = self.clean(str(args.get("body") or "")[:5000], "draft body").strip()
+        if not body:
+            return {"error": "A draft needs a body."}
+        draft = db.add_draft(self.family_id, self.run_id, to, subject, body, str(args.get("purpose") or "")[:200])
+        self.emit("draft", draft=draft)
+        return {"draft_id": draft["id"], "status": "Saved as a draft for the family to review. Not sent."}
 
     def safety_checks(self) -> list[dict]:
         """One line per guard for the answer footer and the report."""
@@ -171,7 +187,10 @@ Decide how to handle the family's newest message. Reply with JSON only:
   "clarifying_question": null or one question when the request is too vague to assign,
   "assignments": [{{"specialist": "<id>", "task": "specific task with the facts they need"}}],
   "request_type": "ok" or "harmful"}}
-Use 1 to {config.MAX_SPECIALISTS_PER_QUESTION} assignments for real questions, 0 otherwise.
+Use 1 to {config.MAX_SPECIALISTS_PER_QUESTION} advisors for real questions, 0 otherwise.
+Also assign "assistant" (Ari) when the family wants something written or answered: an email, letter, text or a reply
+to a message they received. Ari works after the advisors, uses their findings and only saves drafts; nothing is
+ever sent. Ari does not count toward the advisor limit. A writing-only request may go to Ari alone.
 "harmful" means help with fraud, tax evasion, hiding income or assets illegally, lying to a landlord, insurer,
 lender or benefits office, or hurting someone. For harmful requests, put a short, kind refusal that offers a
 lawful alternative in direct_answer and make no assignments.
@@ -198,7 +217,8 @@ NEWEST MESSAGE FROM THE FAMILY:
             if sid in ROSTER and sid not in seen and str(a.get("task", "")).strip():
                 seen.add(sid)
                 assignments.append({"specialist": sid, "task": str(a["task"]).strip()[:800]})
-        plan["assignments"] = assignments[: config.MAX_SPECIALISTS_PER_QUESTION]
+        advisors = [a for a in assignments if a["specialist"] != ASSISTANT][: config.MAX_SPECIALISTS_PER_QUESTION]
+        plan["assignments"] = advisors + [a for a in assignments if a["specialist"] == ASSISTANT][:1]
         if str(plan.get("request_type", "")).lower() == "harmful":
             plan["assignments"] = []
             self.guard(safety.Finding("input", "harmful_request", "The Captain declined and assigned no one"))
@@ -209,7 +229,7 @@ NEWEST MESSAGE FROM THE FAMILY:
         return plan
 
     # -- 2. Specialists work with tools -------------------------------------------
-    async def specialist(self, sid: str, task: str) -> dict:
+    async def specialist(self, sid: str, task: str, team_context: str = "") -> dict:
         spec = ROSTER[sid]
         self.emit("specialist_thinking", specialist=sid)
         system = f"""You are {spec['name']}, the {spec['role']} on a family's advisory team in the iConcierge app.
@@ -229,6 +249,14 @@ When you are done, reply with JSON only:
   "pro_needed": null or "when a licensed professional is worth it and any free/low-cost route"}}"""
         user = (f"Task from the Captain: {task}\n\nThe family's own words: {self.question}\n\n"
                 f"Family profile: {_profile_text(self.profile)}\nUploaded documents:\n{self.documents_text()}")
+        if sid == ASSISTANT:
+            system += ("\nWrite each message with draft_email (one call per message). Write in the family's voice, "
+                       "polite and clear, in the family's language unless the recipient needs English. Use only facts "
+                       "from the family, the documents and the team's findings; put [brackets] where a detail is "
+                       "missing. Never include Social Security, account or card numbers. Never invent an email "
+                       "address: leave 'to' as a description (e.g. 'Landlord') unless the family gave the address. "
+                       "Your memo says what you drafted and that nothing was sent.")
+            user += f"\n\nThe team's findings so far:\n{team_context or '(none: this is a writing-only request)'}"
         messages: list[dict] = [{"role": "system", "content": system}, {"role": "user", "content": user}]
         tool_specs = tools.openai_tools(sid)
         result: dict = {}
@@ -252,6 +280,8 @@ When you are done, reply with JSON only:
                     searches += 1
                 if c.function.name == "search_official_sources" and searches > config.MAX_SEARCHES:
                     output = {"error": "Search limit reached. Use the sources you already found."}
+                elif c.function.name == "draft_email" and sid == ASSISTANT:
+                    output = self.save_draft(_short_args(c.function.arguments))
                 else:
                     output = tools.run_tool(sid, c.function.name, c.function.arguments, self.ctx)
                 if tools.source_by_id(str(output.get("source_id", ""))):
@@ -312,6 +342,8 @@ When you are done, reply with JSON only:
                            for n in notes) or "(no notes)"
         system = f"""You are {self.captain_name}, the Captain. Style: {CAPTAIN_STYLES.get(self.settings.get('captain_style', 'warm'), CAPTAIN_STYLES['warm'])}.
 Combine your team's work into one answer for the family.
+If Ari (My AI Assistant) drafted messages, say they are waiting in the Drafts tab for the family to review, edit and
+send from their own email, and that nothing was sent. Do not repeat the full drafts.
 {self.rules()}
 
 Reply with JSON only:
@@ -372,10 +404,12 @@ Give 0 to 5 todos."""
                 self.emit("captain_summary", answer=str(reply), sources=[], todos=[])
                 db.add_message(self.family_id, "captain", str(reply), self.run_id)
                 return
+            advisors = [a for a in plan["assignments"] if a["specialist"] != ASSISTANT]
+            writer = next((a for a in plan["assignments"] if a["specialist"] == ASSISTANT), None)
             results = await asyncio.gather(*(self.specialist(a["specialist"], a["task"])
-                                              for a in plan["assignments"]), return_exceptions=True)
+                                              for a in advisors), return_exceptions=True)
             memos = []
-            for a, r in zip(plan["assignments"], results):
+            for a, r in zip(advisors, results):
                 if isinstance(r, llm.ContentFiltered):
                     self.guard(safety.Finding("output", "provider_blocked",
                                               f"{a['specialist']}: the provider's content filter stopped this step"))
@@ -383,7 +417,7 @@ Give 0 to 5 todos."""
                     self.emit("error", specialist=a["specialist"], message=f"{type(r).__name__}")
                 else:
                     memos.append(r)
-            if not memos:
+            if not memos and not writer:
                 raise RuntimeError("no specialist finished")
             notes: list[dict] = []
             if len(memos) > 1:
@@ -391,6 +425,17 @@ Give 0 to 5 todos."""
                     *(self.huddle_note(m, [o for o in memos if o is not m]) for m in memos),
                     return_exceptions=True)
                 notes = [h for h in huddles if isinstance(h, dict)]
+            if writer:
+                # The advisors hand their findings to Ari, who turns them into drafts.
+                self.emit("handoff", **{"from": [m["specialist"] for m in memos], "to": ASSISTANT})
+                context = "\n\n".join(f"{ROSTER[m['specialist']]['name']}: {m['memo']}" for m in memos)
+                context += "".join(f"\n{ROSTER[n['from']]['name']} -> {ROSTER[n['to']]['name']}: {n['note']}"
+                                   for n in notes)
+                try:
+                    memos.append(await self.specialist(ASSISTANT, writer["task"], context))
+                except llm.ContentFiltered:
+                    self.guard(safety.Finding("output", "provider_blocked",
+                                              "assistant: the provider's filter stopped this step"))
             summary = await self.summarize(memos, notes)
             self.emit("captain_summary", **summary)
             db.add_message(self.family_id, "captain", summary["answer"], self.run_id)

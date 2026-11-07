@@ -319,6 +319,18 @@ def collect_numbers(obj, into: set[float]) -> None:
             collect_numbers(v, into)
 
 
+def profile_numbers(profile: dict) -> set[float]:
+    """Figures the family gave in their profile, including income ranges written like '75-100k' or '<25k'."""
+    found: set[float] = set()
+    collect_numbers(profile, found)
+    for value in profile.values():
+        for low, high in re.findall(r"(\d+)\s*-\s*(\d+)\s*k\b", str(value), re.I):
+            found.update({float(low) * 1000, float(high) * 1000})
+        for single in re.findall(r"[<>]\s*(\d+)\s*k\b", str(value), re.I):
+            found.add(float(single) * 1000)
+    return found
+
+
 def untraced_numbers(answer: str, known: set[float]) -> list[str]:
     """Numbers in the answer that match no calculator result or family-provided figure (within rounding)."""
     missing = []

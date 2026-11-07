@@ -10,10 +10,22 @@ Sign in, talk to your **Captain**, and watch a team of AI specialists work on yo
 | 📈 | Priya, Investor | Saving, retirement accounts, investing basics | Savings growth, emergency fund, debt payoff |
 | 🏠 | Leo, Housing & Lifestyle | Rent vs. buy, mortgages, affordability, moving | Mortgage, affordability, rent vs. buy, budget |
 | 🛡️ | Grace, Insurance & Benefits | Insurance, SNAP, Medicaid, Social Security, unemployment | Emergency fund, budget, official sources |
+| ✉️ | Ari, My AI Assistant | Emails, letters and replies built on the team's findings | `draft_email` (drafts only: there is no send tool) |
 
 **How a question moves:** the Captain plans and assigns up to 3 specialists → they work in parallel with their tools
 → each sends findings → teammates leave each other short notes (the "huddle") → the Captain combines everything
-into options with numbers, trade-offs, sources and suggested to-dos. You see every step in **The office** panel.
+into options with numbers, trade-offs, sources and suggested to-dos. If the family wants something written, the
+advisors hand their findings to **Ari**, who saves email drafts.
+
+**The office** is a 3D round table: the team sits facing each other and every real event travels across the table
+as a colored ping (assign = gold, calculator = blue, findings = green, huddle note = orange, hand-off to Ari =
+purple) with speech bubbles. Teammates not on the question are dimmed, and **Replay** re-runs the last question's
+events. The step-by-step feed stays underneath.
+
+**Drafts** (✉️ tab): edit Ari's draft, then open it in Gmail, Outlook or your email app, copy it, or copy a ready
+prompt for your own Claude or ChatGPT. **The app never sends email.** Direct Gmail/Outlook/Claude connections are
+designed (sign-in, never a password) but marked "coming soon" because the course allows only the course key unless
+the professor approves another.
 
 Design rules: **options, not orders** (the family decides); **every number comes from code**, not the model;
 **only vetted official sources can be cited** (`backend/sources.json`); uploaded documents are treated as data, never
@@ -72,13 +84,14 @@ steps in, it shows live in **The office**, in a footer under each answer and in 
 **Tested two ways:**
 
 ```bash
-python -m unittest discover tests      # 27 tests, no API key: calculators, sign-in, and attacks on every guard
+python -m unittest discover tests      # 31 tests, no API key: calculators, sign-in, drafts and attacks on every guard
 python tests/redteam.py                # live attacks through the real AI team -> output/redteam_report.md
 ```
 
-Live red-team result on 2026-11-07: **8 of 8 attacks stopped**, including a control question with no false alarms
-(full table in `output/redteam_report.md`). The first run caught a real bug: the "list documents" tool was handing
-the AI the hidden text it had just removed. Fixed, then re-tested. Try it yourself with
+Live red-team result on 2026-11-07: **9 of 9 attacks stopped**, including a scam address planted for Ari's email
+and a control question with no false alarms (full table in `output/redteam_report.md`). The red team caught two real
+bugs: the "list documents" tool was handing the AI the hidden text it had just removed, and the number audit flagged
+the family's own profile income range as made up. Both fixed, then re-tested. Try it yourself with
 `output/demo_lease_with_hidden_text.pdf`, a lease with white text, 1.5-point text and a planted instruction.
 
 ## Data

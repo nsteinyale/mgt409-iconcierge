@@ -4,7 +4,8 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const root = $("#root");
 
-const SPECIALISTS = ["attorney", "accountant", "investor", "housing", "benefits"];
+const SPECIALISTS = ["attorney", "accountant", "investor", "housing", "benefits", "assistant"];
+const PING_COLORS = { assign: "#d9a441", tool: "#3b6fd8", memo: "#2e8b57", note: "#e07a1f", handoff: "#7b4bd1" };
 const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
 const INCOMES = [["<25k", "< $25k"], ["25-50k", "$25k–$50k"], ["50-75k", "$50k–$75k"], ["75-100k", "$75k–$100k"],
   ["100-150k", "$100k–$150k"], ["150-200k", "$150k–$200k"], [">200k", "> $200k"]];
@@ -14,7 +15,8 @@ const STYLES = ["warm", "professional", "upbeat", "straight"];
 const MODES = ["family", "young_adult", "general"];
 
 const state = {
-  me: null, roster: {}, todos: [], docs: [], attached: [], busy: false, tab: "office",
+  me: null, roster: {}, todos: [], docs: [], drafts: [], attached: [], busy: false, tab: "office",
+  lastEvents: [], lastDrafts: [],
   desk: {}, // id -> idle | thinking | working | done
 };
 
@@ -268,7 +270,7 @@ async function showApp() {
         </div>
       </section>
       <section class="panel">
-        <nav class="side-tabs">${["office", "todos", "docs", "safety", "profile"].map(k =>
+        <nav class="side-tabs">${["office", "todos", "docs", "drafts", "safety", "profile"].map(k =>
           `<button data-tab="${k}" class="${state.tab === k ? "on" : ""}">${esc(t("tab_" + k))}</button>`).join("")}</nav>
         <div class="side-body" id="side"></div>
       </section>
@@ -280,14 +282,17 @@ async function showApp() {
     showApp();
   };
   $("#signout").onclick = async () => { await api("/api/signout", { method: "POST" }).catch(() => {}); state.me = null; showAuth("signin"); };
-  $$(".side-tabs button").forEach(b => b.onclick = () => { state.tab = b.dataset.tab; $$(".side-tabs button").forEach(x => x.classList.toggle("on", x === b)); renderSide(); });
+  $$(".side-tabs button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
   const ask = $("#ask");
   ask.addEventListener("input", () => { ask.style.height = "auto"; ask.style.height = Math.min(ask.scrollHeight, 160) + "px"; });
   ask.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
   $("#send").onclick = send;
   $("#attach-btn").onclick = () => { state.tab = "docs"; $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "docs")); renderSide(); };
   SPECIALISTS.concat("captain").forEach(id => state.desk[id] = state.desk[id] || "idle");
-  await Promise.all([loadChat(), loadTodos(), loadDocs()]);
+  await Promise.all([loadChat(), loadTodos(), loadDocs(), loadDrafts()]);
+  // Keep the last run's events so the round table can replay it after a reload.
+  const lastRun = (await api("/api/messages").catch(() => ({ messages: [] }))).messages.filter(m => m.run_id).pop();
+  if (lastRun) state.lastEvents = (await api(`/api/runs/${lastRun.run_id}`).catch(() => ({ events: [] }))).events;
   renderSide();
   renderAttached();
 }
@@ -298,7 +303,7 @@ async function loadChat() {
   chat.innerHTML = "";
   if (!messages.length) {
     chat.insertAdjacentHTML("beforeend", captainBubble(`<p>${esc(t("hello", { name: personName("captain") }))}</p>
-      <div class="samples"><strong>${esc(t("try_asking"))}</strong>${[1, 2, 3].map(i =>
+      <div class="samples"><strong>${esc(t("try_asking"))}</strong>${[1, 2, 3, 4].map(i =>
       `<button data-sample="${i}">${esc(t("sample" + i))}</button>`).join("")}</div>`));
     $$("[data-sample]", chat).forEach(b => b.onclick = () => { $("#ask").value = b.textContent; send(); });
   }
@@ -335,6 +340,8 @@ async function send() {
   chat.scrollTop = chat.scrollHeight;
   state.feed = [];
   state.planned = false;
+  state.lastEvents = [];
+  state.lastDrafts = [];
   SPECIALISTS.concat("captain").forEach(id => state.desk[id] = "idle");
   state.tab = "office";
   $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "office"));
@@ -365,6 +372,7 @@ async function send() {
         if (ev.type === "plan" && ev.ack) $(".bubble", pending).innerHTML = `<em>${esc(ev.ack)}</em>`;
         if (ev.type === "captain_summary") summary = ev;
         if (ev.type === "done") totals = ev.totals;
+        state.lastEvents.push(ev);
         onEvent(ev);
       }
     }
@@ -374,6 +382,7 @@ async function send() {
   pending.remove();
   if (summary) {
     const todos = (state.lastTodos || []).map(td => `<div>☐ ${esc(td.title)}</div>`).join("");
+    const draftChip = (state.lastDrafts || []).length ? `<div class="todo-chips"><div><a href="#" class="open-drafts">✉️ ${esc(t("tab_drafts"))}: ${state.lastDrafts.map(d => esc(d.subject || d.to)).join(" · ")}</a></div><div class="stats">${esc(t("drafts_intro"))}</div></div>` : "";
     const sources = summary.sources.length ? `<div class="sources"><strong>${esc(t("sources"))}</strong>${summary.sources.map(s =>
       `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title)} · ${esc(s.agency)}</a>`).join("")}</div>` : "";
     const checks = state.lastChecks || [];
@@ -382,8 +391,9 @@ async function send() {
       <ul>${checks.map(c => `<li class="st-${c.status}">${c.status === "ok" ? "✓" : c.status === "caught" ? "🛡️" : "⚠️"} ${esc(t("c_" + c.check))} · ${esc(t("st_" + c.status))}</li>`).join("")}</ul></details>` : "";
     const stats = (totals ? `<div class="stats">${esc(t("stats", { calls: totals.calls, cost: totals.cost.toFixed(4), seconds: Math.round(totals.seconds) }))}</div>` : "") + shield;
     chat.insertAdjacentHTML("beforeend", captainBubble(renderMarkdown(summary.answer, summary.sources) + sources +
-      (todos ? `<div class="todo-chips"><strong>${esc(t("todos_added"))}</strong>${todos}</div>` : "") + stats));
+      (todos ? `<div class="todo-chips"><strong>${esc(t("todos_added"))}</strong>${todos}</div>` : "") + draftChip + stats));
     const last = chat.lastElementChild;
+    $(".open-drafts", last)?.addEventListener("click", e => { e.preventDefault(); switchTab("drafts"); });
     $(".avatar", last).classList.add("is-talking");
     setTimeout(() => $(".avatar", last)?.classList.remove("is-talking"), 2400);
   } else {
@@ -399,20 +409,80 @@ async function send() {
 
 function setDesk(id, status) {
   state.desk[id] = status;
-  const desk = $(`.desk[data-id="${id}"]`);
-  if (desk) {
-    desk.className = `desk ${status}`;
-    $(".status", desk).textContent = t("status_" + status);
-    $(".avatar", desk).classList.toggle("is-thinking", status === "thinking" || status === "working");
-  }
+  if (RoundTable.ready) RoundTable.setStatus(id, status, t("status_" + status));
   if (id === "captain") $(".captain-face")?.classList.toggle("is-thinking", status === "thinking");
 }
 
 function talk(id, ms = 1600) {
-  const el = $(`.desk[data-id="${id}"] .avatar`);
-  if (!el) return;
-  el.classList.add("is-talking");
-  setTimeout(() => el.classList.remove("is-talking"), ms);
+  if (RoundTable.ready) RoundTable.talk(id, ms);
+}
+
+function switchTab(tab) {
+  state.tab = tab;
+  $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === tab));
+  renderSide();
+}
+
+// Everything the round table shows for one event. Used live and for Replay.
+function animate(ev) {
+  if (!RoundTable.ready) return;
+  const short = s => String(s || "").replace(/\s+/g, " ").trim();
+  switch (ev.type) {
+    case "run_started":
+      ["captain", ...SPECIALISTS].forEach(id => setDesk(id, "idle"));
+      RoundTable.bench(null);
+      break;
+    case "captain_thinking": setDesk("captain", "thinking"); break;
+    case "plan":
+      setDesk("captain", "idle"); talk("captain");
+      RoundTable.bench(ev.assignments.map(a => a.specialist));
+      if (ev.ack) RoundTable.bubble("captain", short(ev.ack));
+      break;
+    case "assign": RoundTable.ping("captain", ev.to, "assign"); break;
+    case "specialist_thinking": setDesk(ev.specialist, "thinking"); break;
+    case "tool_call":
+      setDesk(ev.specialist, "working");
+      RoundTable.ping(ev.specialist, "table", "tool", { duration: 650 });
+      break;
+    case "tool_result":
+      RoundTable.ping(ev.specialist, "table", "tool", { back: true, duration: 650 });
+      RoundTable.centerNote(`${personName(ev.specialist)} · ${t("tool_" + ev.tool)}: ${short(ev.summary)}`);
+      break;
+    case "memo":
+      setDesk(ev.specialist, "done"); talk(ev.specialist);
+      RoundTable.ping(ev.specialist, "captain", "memo");
+      RoundTable.bubble(ev.specialist, short(ev.memo));
+      break;
+    case "huddle_note":
+      talk(ev.from);
+      RoundTable.ping(ev.from, ev.to, "note", { duration: 1100 });
+      RoundTable.bubble(ev.from, `→ ${personName(ev.to)}: ${short(ev.note)}`, 5000);
+      break;
+    case "handoff":
+      setDesk("assistant", "thinking");
+      (ev.from.length ? ev.from : ["captain"]).forEach(f => RoundTable.ping(f, "assistant", "handoff", { duration: 1000 }));
+      break;
+    case "draft":
+      talk("assistant");
+      RoundTable.ping("assistant", "captain", "handoff");
+      RoundTable.bubble("assistant", `✉️ ${short(ev.draft.subject || ev.draft.to)}`);
+      break;
+    case "captain_summary": setDesk("captain", "idle"); talk("captain", 2400); break;
+    case "error": if (ev.specialist) setDesk(ev.specialist, "idle"); break;
+  }
+}
+
+async function replay() {
+  const events = state.lastEvents || [];
+  if (!events.length || state.busy) return;
+  let prev = 0;
+  for (const ev of events) {
+    if (!RoundTable.ready || state.tab !== "office") return;
+    const gap = Math.min(1200, Math.max(0, (ev.t - prev) * 1000 / 2));
+    prev = ev.t;
+    if (gap) await new Promise(r => setTimeout(r, gap));
+    animate(ev);
+  }
 }
 
 function pushFeed(item) {
@@ -440,24 +510,19 @@ function fmtArgs(args) {
 
 function onEvent(ev) {
   const cap = personName("captain");
+  animate(ev);
   switch (ev.type) {
     case "captain_thinking":
-      setDesk("captain", "thinking");
       pushFeed({ who: "captain", html: `<em>${esc(t(state.planned ? "ev_summary" : "ev_plan", { captain: cap }))}…</em>` });
       break;
     case "plan":
       state.planned = true;
-      setDesk("captain", "idle"); talk("captain");
       if (ev.ack) pushFeed({ who: "captain", html: `<span class="who">${esc(cap)}</span>: ${esc(ev.ack)}` });
       break;
     case "assign":
       pushFeed({ cls: "note", who: "captain", html: `<span class="who">${esc(t("ev_assign", { captain: cap, to: personName(ev.to) }))}</span><br>${esc(ev.task)}` });
       break;
-    case "specialist_thinking":
-      setDesk(ev.specialist, "thinking");
-      break;
     case "tool_call": {
-      setDesk(ev.specialist, "working");
       const key = `${ev.specialist}-${state.feed.length}`;
       state.lastToolKey = state.lastToolKey || {};
       state.lastToolKey[ev.specialist] = key;
@@ -474,18 +539,21 @@ function onEvent(ev) {
       break;
     }
     case "memo": {
-      setDesk(ev.specialist, "done"); talk(ev.specialist);
       const nums = (ev.key_numbers || []).map(n => `<li>${esc(n.label)}: <strong>${esc(n.value)}</strong></li>`).join("");
       pushFeed({ cls: "memo", who: ev.specialist, html: `<details><summary><span class="who">${esc(personName(ev.specialist))}</span> ${esc(t("ev_memo", { captain: cap }))}</summary>
         <p>${esc(ev.memo)}</p>${nums ? `<ul>${nums}</ul>` : ""}${ev.pro_needed ? `<p>👩‍⚖️ ${esc(ev.pro_needed)}</p>` : ""}</details>` });
       break;
     }
     case "huddle_note":
-      talk(ev.from);
       pushFeed({ cls: "note", who: ev.from, html: `<span class="who">${esc(t("ev_note", { from: personName(ev.from), to: personName(ev.to) }))}</span><br>${esc(ev.note)}` });
       break;
-    case "captain_summary":
-      setDesk("captain", "idle"); talk("captain", 2400);
+    case "handoff":
+      pushFeed({ cls: "note", who: "assistant", html: `<span class="who">${esc(t("ev_handoff", { to: personName("assistant") }))}</span>` });
+      break;
+    case "draft":
+      state.drafts.unshift(ev.draft);
+      state.lastDrafts.push(ev.draft);
+      pushFeed({ cls: "memo", who: "assistant", html: `<span class="who">${esc(personName("assistant"))}</span> ${esc(t("ev_draft", { subject: ev.draft.subject || ev.draft.to }))}` });
       break;
     case "todo_added":
       state.todos.unshift(ev.todo);
@@ -500,7 +568,6 @@ function onEvent(ev) {
       break;
     case "error":
       pushFeed({ cls: "error", who: ev.specialist || "captain", html: `<strong>${esc(t("ev_error"))}</strong> ${esc(ev.message)}` });
-      if (ev.specialist) setDesk(ev.specialist, "idle");
       break;
     case "done":
       pushFeed({ who: "captain", html: `✅ ${esc(t("ev_done"))} · ${esc(t("stats", { calls: ev.totals.calls, cost: ev.totals.cost.toFixed(4), seconds: Math.round(ev.totals.seconds) }))}` });
@@ -513,12 +580,16 @@ function renderSide() {
   const side = $("#side");
   if (!side) return;
   if (state.tab === "office") {
-    const desks = ["captain", ...SPECIALISTS].map(id => `<div class="desk ${state.desk[id] || "idle"}" data-id="${id}">
-      ${avatarHTML(id, "", state.desk[id] === "thinking" || state.desk[id] === "working" ? "is-thinking" : "")}
-      <div class="name">${esc(personName(id))}</div><div class="role">${esc(t("role_" + id))}</div>
-      <div class="status">${esc(t("status_" + (state.desk[id] || "idle")))}</div></div>`).join("");
+    const legend = ["assign", "tool", "memo", "note", "handoff"].map(k => `<span><i style="background:${PING_COLORS[k]}"></i>${esc(t("lg_" + k))}</span>`).join("");
     const feed = (state.feed || []).map(feedItemHTML).join("") || `<div class="feed-empty">${esc(t("office_empty"))}</div>`;
-    side.innerHTML = `<div class="desks">${desks}</div><div class="feed" id="feed">${feed}</div>`;
+    side.innerHTML = `<div class="rt-wrap"><div id="rt"></div>
+      <div class="rt-tools"><div class="legend">${legend}</div>
+      <button id="replay" ${(state.lastEvents || []).length ? "" : "disabled"}>${esc(t("replay"))}</button></div></div>
+      <div class="feed" id="feed">${feed}</div>`;
+    RoundTable.render($("#rt"), ["captain", ...SPECIALISTS], {
+      avatar: id => avatarHTML(id), name: id => esc(personName(id)), role: id => esc(t("role_" + id)), status: s => esc(t("status_" + s)) });
+    ["captain", ...SPECIALISTS].forEach(id => RoundTable.setStatus(id, state.desk[id] || "idle", t("status_" + (state.desk[id] || "idle"))));
+    $("#replay").onclick = replay;
   } else if (state.tab === "todos") {
     side.innerHTML = `<form class="add-row" id="todo-form"><input id="todo-new" maxlength="200" placeholder="${esc(t("add_todo_ph"))}">
       <button class="btn small">${esc(t("add"))}</button></form>
@@ -560,6 +631,52 @@ function renderSide() {
       await api(`/api/documents/${b.dataset.delDoc}`, { method: "DELETE" });
       state.attached = state.attached.filter(x => x !== Number(b.dataset.delDoc));
       await loadDocs(); renderAttached(); renderSide();
+    });
+  } else if (state.tab === "drafts") {
+    const isEmail = s => /^[^\s@<>]+@[^\s@<>]+\.[a-z]{2,}$/i.test(String(s || "").trim());
+    side.innerHTML = `<div class="not-sent">✉️ ${esc(t("drafts_intro"))}</div>
+      ${state.drafts.length ? state.drafts.map(d => `<div class="draft" data-draft="${d.id}">
+        ${d.purpose ? `<div class="purpose">${esc(d.purpose)}</div>` : ""}
+        <input data-f="to" maxlength="200" aria-label="${esc(t("d_to"))}" placeholder="${esc(t("d_to"))}" value="${esc(d.to)}">
+        <input data-f="subject" maxlength="200" aria-label="${esc(t("d_subject"))}" placeholder="${esc(t("d_subject"))}" value="${esc(d.subject)}">
+        <textarea data-f="body" maxlength="5000" aria-label="${esc(t("d_body"))}">${esc(d.body)}</textarea>
+        <div class="actions">
+          <button class="btn small gold" data-act="gmail">${esc(t("open_gmail"))}</button>
+          <button class="btn small ghost" data-act="outlook">${esc(t("open_outlook"))}</button>
+          <button class="btn small ghost" data-act="mailto">${esc(t("open_mail"))}</button>
+          <button class="btn small ghost" data-act="copy">${esc(t("copy"))}</button>
+          <button class="btn small ghost" data-act="ai">${esc(t("copy_ai"))}</button>
+          <button class="btn small ghost" data-act="delete">${esc(t("delete"))}</button>
+        </div></div>`).join("") : `<div class="feed-empty">${esc(t("no_drafts"))}</div>`}
+      <div class="connections"><h4>${esc(t("connections"))}</h4><p class="stats">${esc(t("conn_intro"))}</p>
+        ${[["📧", "conn_gmail"], ["📨", "conn_outlook"], ["🤖", "conn_claude"]].map(([icon, k]) => `<div class="conn"><span>${icon}</span>
+          <div class="grow">${esc(t(k))}<br><small class="stats">${esc(t("conn_why"))}</small></div><span class="soon">${esc(t("conn_soon"))}</span></div>`).join("")}
+      </div>`;
+    $$(".draft").forEach(card => {
+      const id = Number(card.dataset.draft);
+      const read = () => Object.fromEntries($$("[data-f]", card).map(el => [el.dataset.f, el.value]));
+      $$("[data-f]", card).forEach(el => el.addEventListener("change", async () => {
+        const d = read();
+        await api(`/api/drafts/${id}`, { method: "PUT", body: d }).catch(() => {});
+        Object.assign(state.drafts.find(x => x.id === id) || {}, d);
+      }));
+      $$("[data-act]", card).forEach(b => b.onclick = async () => {
+        const d = read(), enc = encodeURIComponent, to = isEmail(d.to) ? d.to.trim() : "";
+        const act = b.dataset.act;
+        if (act === "gmail") window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${enc(to)}&su=${enc(d.subject)}&body=${enc(d.body)}`, "_blank", "noopener");
+        if (act === "outlook") window.open(`https://outlook.office.com/mail/deeplink/compose?to=${enc(to)}&subject=${enc(d.subject)}&body=${enc(d.body)}`, "_blank", "noopener");
+        if (act === "mailto") location.href = `mailto:${enc(to)}?subject=${enc(d.subject)}&body=${enc(d.body)}`;
+        if (act === "copy" || act === "ai") {
+          const text = (act === "ai" ? t("ai_prompt") + "\n\n" : "") + `${t("d_to")}: ${d.to}\n${t("d_subject")}: ${d.subject}\n\n${d.body}`;
+          await navigator.clipboard.writeText(text).catch(() => {});
+          const old = b.textContent; b.textContent = t("copied"); setTimeout(() => b.textContent = old, 1500);
+        }
+        if (act === "delete") {
+          await api(`/api/drafts/${id}`, { method: "DELETE" }).catch(() => {});
+          state.drafts = state.drafts.filter(x => x.id !== id);
+          renderSide();
+        }
+      });
     });
   } else if (state.tab === "safety") {
     side.innerHTML = `<p class="stats">${esc(t("safety_intro"))}</p><div id="safety-list"></div>`;
@@ -608,6 +725,7 @@ function renderAttached() {
 }
 
 async function loadTodos() { state.todos = (await api("/api/todos").catch(() => ({ todos: [] }))).todos; }
+async function loadDrafts() { state.drafts = (await api("/api/drafts").catch(() => ({ drafts: [] }))).drafts; }
 async function loadDocs() { state.docs = (await api("/api/documents").catch(() => ({ documents: [] }))).documents; }
 
 async function uploadFile(e) {

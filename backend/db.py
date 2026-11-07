@@ -63,6 +63,16 @@ CREATE TABLE IF NOT EXISTS documents (
     text TEXT NOT NULL,
     created_at REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS drafts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    family_id INTEGER NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+    run_id INTEGER,
+    to_text TEXT NOT NULL DEFAULT '',
+    subject TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL,
+    purpose TEXT NOT NULL DEFAULT '',
+    created_at REAL NOT NULL
+);
 CREATE TABLE IF NOT EXISTS safety_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     family_id INTEGER,
@@ -316,6 +326,36 @@ def delete_document(family_id: int, doc_id: int) -> bool:
     with connect() as conn:
         cur = conn.execute("DELETE FROM documents WHERE id = ? AND family_id = ?", (doc_id, family_id))
         return cur.rowcount > 0
+
+
+# --- drafts (never sent by the app) ----------------------------------------------------
+
+def add_draft(family_id: int, run_id: int | None, to: str, subject: str, body: str, purpose: str) -> dict:
+    with connect() as conn:
+        cur = conn.execute(
+            "INSERT INTO drafts (family_id, run_id, to_text, subject, body, purpose, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)", (family_id, run_id, to, subject, body, purpose, time.time()))
+        return {"id": int(cur.lastrowid), "to": to, "subject": subject, "body": body, "purpose": purpose}
+
+
+def list_drafts(family_id: int) -> list[dict]:
+    with connect() as conn:
+        rows = conn.execute("SELECT id, to_text, subject, body, purpose, created_at FROM drafts "
+                            "WHERE family_id = ? ORDER BY id DESC", (family_id,)).fetchall()
+    return [{"id": r["id"], "to": r["to_text"], "subject": r["subject"], "body": r["body"],
+             "purpose": r["purpose"], "created_at": r["created_at"]} for r in rows]
+
+
+def update_draft(family_id: int, draft_id: int, to: str, subject: str, body: str) -> bool:
+    with connect() as conn:
+        cur = conn.execute("UPDATE drafts SET to_text = ?, subject = ?, body = ? WHERE id = ? AND family_id = ?",
+                           (to, subject, body, draft_id, family_id))
+        return cur.rowcount > 0
+
+
+def delete_draft(family_id: int, draft_id: int) -> bool:
+    with connect() as conn:
+        return conn.execute("DELETE FROM drafts WHERE id = ? AND family_id = ?", (draft_id, family_id)).rowcount > 0
 
 
 # --- safety log and rate limits -------------------------------------------------------

@@ -295,6 +295,35 @@ async def upload_document(body: DocumentIn, family: dict = Depends(current_famil
             "hidden": check.hidden, "flagged": check.flagged, "safety": [f.as_dict() for f in findings]}
 
 
+class DraftIn(BaseModel):
+    to: str = Field(default="", max_length=200)
+    subject: str = Field(default="", max_length=200)
+    body: str = Field(min_length=1, max_length=5000)
+
+
+@app.get("/api/drafts")
+def drafts(family: dict = Depends(current_family)):
+    return {"drafts": db.list_drafts(family["id"])}
+
+
+@app.put("/api/drafts/{draft_id}")
+def edit_draft(draft_id: int, body: DraftIn, family: dict = Depends(current_family)):
+    # Family edits are scrubbed of private numbers too, since drafts leave the app through hand-off links.
+    to, _ = safety.redact_private(body.to)
+    subject, _ = safety.redact_private(body.subject)
+    text, _ = safety.redact_private(body.body)
+    if not db.update_draft(family["id"], draft_id, to, subject, text):
+        raise HTTPException(status_code=404, detail="not_found")
+    return {"ok": True}
+
+
+@app.delete("/api/drafts/{draft_id}")
+def remove_draft(draft_id: int, family: dict = Depends(current_family)):
+    if not db.delete_draft(family["id"], draft_id):
+        raise HTTPException(status_code=404, detail="not_found")
+    return {"ok": True}
+
+
 @app.get("/api/safety")
 def safety_log(family: dict = Depends(current_family)):
     return {"events": db.list_safety(family["id"])}

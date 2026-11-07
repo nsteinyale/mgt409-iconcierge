@@ -62,6 +62,11 @@ class ToolPermissions(unittest.TestCase):
         out = tools.run_tool("attorney", "estimate_federal_income_tax", '{"gross_income": 1}', CTX)
         self.assertIn("error", out)
 
+    def test_only_the_assistant_may_draft(self):
+        self.assertIn("error", tools.run_tool("attorney", "draft_email", '{"to": "x", "subject": "s", "body": "b"}', CTX))
+        self.assertIn("draft_email", tools.TOOLSETS["assistant"])
+        self.assertNotIn("estimate_federal_income_tax", tools.TOOLSETS["assistant"])
+
     def test_bad_arguments_become_error(self):
         out = tools.run_tool("accountant", "loan_payoff", "not json", CTX)
         self.assertIn("error", out)

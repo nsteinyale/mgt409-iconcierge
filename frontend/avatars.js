@@ -20,6 +20,8 @@ const PEOPLE = {
                 extra: "badge", badge: "chart", accent: "#ffd166" },
   housing:    { bg: "#fbe3d3", skin: "#e8b18f", hair: "#8a4b23", hairStyle: "curly", outfit: "#d9662b",
                 extra: "badge", badge: "house", accent: "#fff3e6" },
+  assistant:  { bg: "#d8f3ef", skin: "#c99a74", hair: "#3a2a4a", hairStyle: "ponytail", outfit: "#1b8a8a",
+                extra: "badge", badge: "mail", accent: "#ffffff" },
   benefits:   { bg: "#ece0f5", skin: "#f3d1b8", hair: "#9a9a9a", hairStyle: "bob", outfit: "#6a3f8f",
                 extra: "badge", badge: "shield", accent: "#f7e9ff", glasses: true },
 };
@@ -65,6 +67,7 @@ function badgeIcon(kind) {
     case "calc": return `<rect x="76" y="99" width="8" height="10" rx="1" ${s}/><path d="M77.5 101.5 H82.5" ${s}/>`;
     case "chart": return `<path d="M75 108 L78 104 L81 106 L85 100" ${s}/>`;
     case "house": return `<path d="M75 104 L80 99.5 L85 104 V109 H75Z" ${s}/>`;
+    case "mail": return `<rect x="75" y="100.5" width="10" height="7" rx="1" ${s}/><path d="M75 101 L80 105 L85 101" ${s}/>`;
     case "shield": return `<path d="M80 98.5 L85 100.5 V104 Q85 108 80 109.5 Q75 108 75 104 V100.5Z" ${s}/>`;
     default: return "";
   }
