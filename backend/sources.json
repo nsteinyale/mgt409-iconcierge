@@ -1,0 +1,442 @@
+[
+ {
+  "id": "irs-brackets-2026",
+  "title": "IRS: tax inflation adjustments for tax year 2026",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill",
+  "specialists": [
+   "accountant"
+  ],
+  "topics": "tax brackets standard deduction 2026 income tax rates inflation adjustment",
+  "summary": "Official 2026 tax brackets, standard deductions and other inflation-adjusted amounts (Rev. Proc. 2025-32).",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-free-file",
+  "title": "IRS Free File",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/e-file-do-your-taxes-for-free",
+  "specialists": [
+   "accountant"
+  ],
+  "topics": "file taxes free software tax return filing",
+  "summary": "Free federal tax filing software for eligible taxpayers through IRS partners.",
+  "checked": "2026-11-07: link opened",
+  "aliases": [
+   "https://www.irs.gov/filing/free-file-do-your-federal-taxes-for-free"
+  ]
+ },
+ {
+  "id": "irs-vita",
+  "title": "IRS: free tax return preparation (VITA/TCE)",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/individuals/free-tax-return-preparation-for-qualifying-taxpayers",
+  "specialists": [
+   "accountant",
+   "benefits"
+  ],
+  "topics": "free tax help preparer volunteer vita tce low income elderly",
+  "summary": "IRS-certified volunteers prepare tax returns for free for people who qualify.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-eitc",
+  "title": "IRS: Earned Income Tax Credit (EITC)",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc",
+  "specialists": [
+   "accountant",
+   "benefits"
+  ],
+  "topics": "eitc earned income credit refund working families children low income",
+  "summary": "Rules and eligibility for the Earned Income Tax Credit for working people with low to moderate income.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-child-tax-credit",
+  "title": "IRS: Child Tax Credit",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/credits-deductions/individuals/child-tax-credit",
+  "specialists": [
+   "accountant",
+   "benefits"
+  ],
+  "topics": "child tax credit kids dependents credit",
+  "summary": "Who can claim the Child Tax Credit and how it works.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-withholding-estimator",
+  "title": "IRS Tax Withholding Estimator",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/individuals/tax-withholding-estimator",
+  "specialists": [
+   "accountant"
+  ],
+  "topics": "withholding w-4 paycheck refund owe estimator",
+  "summary": "IRS tool to check whether the right amount of tax is withheld from your pay.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-ira-limits",
+  "title": "IRS: IRA contribution limits",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-ira-contribution-limits",
+  "specialists": [
+   "investor",
+   "accountant"
+  ],
+  "topics": "ira roth traditional contribution limit retirement account",
+  "summary": "Yearly contribution limits for traditional and Roth IRAs.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-401k-limits",
+  "title": "IRS: 401(k) contribution limits",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits",
+  "specialists": [
+   "investor",
+   "accountant"
+  ],
+  "topics": "401k employer plan contribution limit match retirement",
+  "summary": "Contribution limits for 401(k) and similar workplace retirement plans.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "investor-gov",
+  "title": "Investor.gov (SEC)",
+  "agency": "SEC",
+  "url": "https://www.investor.gov/",
+  "specialists": [
+   "investor"
+  ],
+  "topics": "investing basics stocks bonds funds fees compound interest fraud",
+  "summary": "The SEC's site for individual investors: basics, calculators and fraud warnings.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "investor-gov-compound",
+  "title": "Investor.gov compound interest calculator",
+  "agency": "SEC",
+  "url": "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
+  "specialists": [
+   "investor"
+  ],
+  "topics": "compound interest calculator savings growth",
+  "summary": "SEC calculator showing how savings grow with compound interest.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "finra-brokercheck",
+  "title": "FINRA BrokerCheck",
+  "agency": "FINRA",
+  "url": "https://brokercheck.finra.org/",
+  "specialists": [
+   "investor"
+  ],
+  "topics": "check financial advisor broker background license disciplinary",
+  "summary": "Free lookup of a broker's or investment adviser's background and disciplinary history.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "fdic-deposit-insurance",
+  "title": "FDIC: deposit insurance",
+  "agency": "FDIC",
+  "url": "https://www.fdic.gov/resources/deposit-insurance",
+  "specialists": [
+   "investor",
+   "insurance"
+  ],
+  "topics": "bank deposit insurance fdic savings account safe 250000",
+  "summary": "How FDIC insurance protects bank deposits and its coverage limits.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "treasury-direct",
+  "title": "TreasuryDirect: savings bonds and Treasury securities",
+  "agency": "U.S. Treasury",
+  "url": "https://www.treasurydirect.gov/",
+  "specialists": [
+   "investor"
+  ],
+  "topics": "savings bonds i bonds treasury bills safe investment",
+  "summary": "Buy and manage U.S. savings bonds and Treasury securities directly.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "cfpb-home",
+  "title": "CFPB: buying a house",
+  "agency": "CFPB",
+  "url": "https://www.consumerfinance.gov/owning-a-home/",
+  "specialists": [
+   "housing",
+   "accountant"
+  ],
+  "topics": "buy house mortgage home buying closing costs down payment",
+  "summary": "Consumer Financial Protection Bureau guide to the home-buying process and mortgages.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "cfpb-ask",
+  "title": "CFPB: Ask CFPB",
+  "agency": "CFPB",
+  "url": "https://www.consumerfinance.gov/ask-cfpb/",
+  "specialists": [
+   "accountant",
+   "attorney",
+   "housing"
+  ],
+  "topics": "debt collection credit card loans consumer rights complaint",
+  "summary": "Plain-language answers about credit, debt, loans and consumer rights.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "cfpb-complaint",
+  "title": "CFPB: submit a complaint",
+  "agency": "CFPB",
+  "url": "https://www.consumerfinance.gov/complaint/",
+  "specialists": [
+   "attorney",
+   "accountant"
+  ],
+  "topics": "complaint bank lender debt collector credit bureau",
+  "summary": "File a complaint about a financial company with the CFPB.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "annual-credit-report",
+  "title": "AnnualCreditReport.com",
+  "agency": "Federally authorized",
+  "url": "https://www.annualcreditreport.com/index.action",
+  "specialists": [
+   "accountant",
+   "housing"
+  ],
+  "topics": "credit report free check credit score errors",
+  "summary": "The official site for free credit reports from the three national credit bureaus.",
+  "checked": "2026-11-07: link opened",
+  "aliases": [
+   "https://www.annualcreditreport.com/"
+  ]
+ },
+ {
+  "id": "hud-rental-help",
+  "title": "HUD: rental assistance",
+  "agency": "HUD",
+  "url": "https://www.hud.gov/topics/rental_assistance",
+  "specialists": [
+   "housing",
+   "benefits"
+  ],
+  "topics": "rent help public housing housing choice voucher section 8 affordable",
+  "summary": "Overview of HUD rental assistance: public housing, vouchers and subsidized apartments.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "hud-housing-counselor",
+  "title": "HUD: find a housing counselor",
+  "agency": "HUD",
+  "url": "https://www.hud.gov/findacounselor",
+  "specialists": [
+   "housing"
+  ],
+  "topics": "housing counselor free first time buyer foreclosure counseling",
+  "summary": "Find a HUD-approved housing counseling agency for buying, renting or avoiding foreclosure.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "usa-benefits",
+  "title": "USA.gov: government benefits",
+  "agency": "USA.gov",
+  "url": "https://www.usa.gov/benefits",
+  "specialists": [
+   "benefits"
+  ],
+  "topics": "government benefits find eligibility food housing health money help",
+  "summary": "Federal starting point for finding government benefits you may be eligible for.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "snap-eligibility",
+  "title": "USDA: SNAP eligibility",
+  "agency": "USDA",
+  "url": "https://www.fns.usda.gov/snap/recipient/eligibility",
+  "specialists": [
+   "benefits"
+  ],
+  "topics": "snap food stamps food assistance eligibility income",
+  "summary": "Who can get SNAP food benefits and how eligibility is decided.",
+  "checked": "2026-11-07: link opened",
+  "aliases": [
+   "https://www.fna.usda.gov/snap/recipient/eligibility"
+  ]
+ },
+ {
+  "id": "healthcare-gov",
+  "title": "HealthCare.gov",
+  "agency": "CMS",
+  "url": "https://www.healthcare.gov/",
+  "specialists": [
+   "insurance",
+   "benefits"
+  ],
+  "topics": "health insurance marketplace aca obamacare plans subsidy open enrollment",
+  "summary": "The federal health insurance marketplace: plans, savings and enrollment periods.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "medicaid",
+  "title": "Medicaid.gov",
+  "agency": "CMS",
+  "url": "https://www.medicaid.gov/",
+  "specialists": [
+   "insurance",
+   "benefits"
+  ],
+  "topics": "medicaid chip health coverage low income children",
+  "summary": "Information about Medicaid and CHIP health coverage.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "medicare",
+  "title": "Medicare.gov",
+  "agency": "CMS",
+  "url": "https://www.medicare.gov/",
+  "specialists": [
+   "insurance",
+   "benefits"
+  ],
+  "topics": "medicare 65 retirement health insurance parts",
+  "summary": "Official Medicare site: coverage, plans and enrollment.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "ssa-retirement",
+  "title": "Social Security: retirement benefits",
+  "agency": "SSA",
+  "url": "https://www.ssa.gov/benefits/retirement/",
+  "specialists": [
+   "benefits",
+   "investor"
+  ],
+  "topics": "social security retirement benefits claim age",
+  "summary": "How Social Security retirement benefits work and when to claim.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "ssa-disability",
+  "title": "Social Security: disability benefits",
+  "agency": "SSA",
+  "url": "https://www.ssa.gov/disability",
+  "specialists": [
+   "benefits",
+   "insurance"
+  ],
+  "topics": "disability ssdi ssi apply benefits",
+  "summary": "Apply for and learn about Social Security disability benefits.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "dol-unemployment",
+  "title": "CareerOneStop (U.S. Dept. of Labor): find unemployment benefits",
+  "agency": "DOL / CareerOneStop",
+  "url": "https://www.careeronestop.org/LocalHelp/UnemploymentBenefits/find-unemployment-benefits.aspx",
+  "specialists": [
+   "benefits"
+  ],
+  "topics": "unemployment insurance lost job layoff benefits",
+  "summary": "How unemployment insurance works and links to state programs.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "naic-consumer",
+  "title": "NAIC: insurance consumer information",
+  "agency": "NAIC",
+  "url": "https://content.naic.org/consumer",
+  "specialists": [
+   "insurance"
+  ],
+  "topics": "insurance consumer auto home life renters policy state regulator",
+  "summary": "Consumer guides from the national association of state insurance regulators.",
+  "checked": "2026-11-07: site blocks automated checks; official page"
+ },
+ {
+  "id": "lsc-legal-aid",
+  "title": "Legal Services Corporation: find legal aid",
+  "agency": "LSC",
+  "url": "https://www.lsc.gov/about-lsc/what-legal-aid/i-need-legal-help",
+  "specialists": [
+   "attorney"
+  ],
+  "topics": "free legal aid lawyer low income civil legal help",
+  "summary": "Find a federally funded civil legal aid office near you.",
+  "checked": "2026-11-07: link opened",
+  "aliases": [
+   "https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help"
+  ]
+ },
+ {
+  "id": "lawhelp",
+  "title": "LawHelp.org",
+  "agency": "Pro Bono Net",
+  "url": "https://www.lawhelp.org/",
+  "specialists": [
+   "attorney"
+  ],
+  "topics": "legal help state free lawyer self help forms",
+  "summary": "State-by-state directory of free legal aid and self-help legal information.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "aba-free-legal-answers",
+  "title": "ABA Free Legal Answers",
+  "agency": "American Bar Association",
+  "url": "https://abafreelegalanswers.org/",
+  "specialists": [
+   "attorney"
+  ],
+  "topics": "ask a lawyer online free question civil legal",
+  "summary": "Volunteer lawyers answer civil legal questions online for people who qualify.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "ftc-report-fraud",
+  "title": "FTC: ReportFraud",
+  "agency": "FTC",
+  "url": "https://reportfraud.ftc.gov/",
+  "specialists": [
+   "attorney",
+   "accountant"
+  ],
+  "topics": "scam fraud report bad business practices consumer",
+  "summary": "Report scams, fraud and bad business practices to the Federal Trade Commission.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "identity-theft",
+  "title": "IdentityTheft.gov",
+  "agency": "FTC",
+  "url": "https://www.identitytheft.gov/",
+  "specialists": [
+   "attorney",
+   "accountant"
+  ],
+  "topics": "identity theft report recovery plan stolen ssn",
+  "summary": "Report identity theft and get a personal recovery plan.",
+  "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "studentaid",
+  "title": "Federal Student Aid",
+  "agency": "U.S. Dept. of Education",
+  "url": "https://studentaid.gov/",
+  "specialists": [
+   "accountant",
+   "benefits"
+  ],
+  "topics": "student loans fafsa repayment college aid",
+  "summary": "FAFSA, federal student loans and repayment options.",
+  "checked": "2026-11-07: link opened"
+ }
+]
