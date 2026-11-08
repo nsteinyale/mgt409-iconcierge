@@ -138,7 +138,7 @@ function showAuth(mode) {
   ${pageVideo()}
   <div class="auth-wrap"><div class="auth-card">
     <div class="auth-hero">
-      <div class="brand">i<span>Concierge</span></div>
+      <div class="brand">iConcierge</div>
       <div class="brand-sub">${esc(t("subtitle"))}</div>
       <p>${esc(t("tagline"))}</p>
       <div class="team-row">${team}</div>
@@ -277,7 +277,7 @@ async function showApp() {
   root.innerHTML = `
   <div class="app">
     <header class="topbar">
-      <div class="brand">i<span>Concierge</span><small class="brand-sub">${esc(t("subtitle"))}</small></div>
+      <div class="brand">iConcierge<small class="brand-sub">${esc(t("subtitle"))}</small></div>
       ${langSelect()}
       <span class="who">👪 ${esc(me.handle)}</span>
       <button class="btn ghost small" id="signout">${esc(t("signout"))}</button>

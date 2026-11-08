@@ -68,8 +68,8 @@ a { color: var(--navy-2); }
 .auth-card { width: min(980px, 100%); background: var(--paper); border-radius: 22px; box-shadow: var(--shadow); overflow: hidden;
   display: grid; grid-template-columns: 1.05fr 1fr; }
 .auth-hero { background: linear-gradient(160deg, var(--navy), var(--navy-2)); color: #fff; padding: 2.4rem; display: flex; flex-direction: column; gap: 1.2rem; }
-.brand { font-size: 2rem; font-weight: 800; letter-spacing: -.5px; }
-.brand span { color: var(--gold); }
+.brand { font-size: 2rem; font-weight: 800; letter-spacing: -.5px; color: var(--gold); }
+
 .auth-hero p { font-size: 1.1rem; line-height: 1.5; opacity: .92; margin: 0; }
 .team-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: auto; }
 .team-row .avatar { width: 64px; height: 64px; }
