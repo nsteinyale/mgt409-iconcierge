@@ -73,7 +73,15 @@ function badgeIcon(kind) {
   }
 }
 
+// Filled from /api/roster: avatar id -> photo file in /static/portraits/.
+let PORTRAITS = {};
+
 function avatarSVG(id) {
+  const photo = PORTRAITS[id];
+  if (photo) {
+    return `<img class="avatar-photo" src="/static/portraits/${encodeURIComponent(photo)}" alt="" loading="lazy" draggable="false">
+      <span class="ai-badge" title="AI team member">AI</span>`;
+  }
   const p = PEOPLE[id] || PEOPLE.captain_a;
   const glasses = p.glasses
     ? `<g stroke="#2b2b2b" stroke-width="2" fill="rgba(255,255,255,.25)"><circle cx="50" cy="58" r="7"/><circle cx="70" cy="58" r="7"/><path d="M57 58 H63"/></g>` : "";

@@ -100,7 +100,11 @@ function renderMarkdown(text, sources = []) {
 // ---------- boot ----------
 async function boot() {
   setLang(localStorage.getItem("ic_lang") || (navigator.language || "en").slice(0, 2));
-  try { state.roster = (await api("/api/roster")).specialists; } catch { /* shown later */ }
+  try {
+    const roster = await api("/api/roster");
+    state.roster = roster.specialists;
+    PORTRAITS = roster.portraits || {};
+  } catch { /* shown later */ }
   try {
     state.me = await api("/api/me");
     setLang(state.me.settings.language);

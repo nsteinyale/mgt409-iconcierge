@@ -189,10 +189,22 @@ def get_run(run_id: int, family: dict = Depends(current_family)):
     return run
 
 
+PORTRAIT_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
+
+
+def portraits() -> dict:
+    """Photo portraits dropped into frontend/portraits/ (named after the avatar id) replace the drawings."""
+    folder = config.FRONTEND / "portraits"
+    if not folder.is_dir():
+        return {}
+    return {f.stem.lower(): f.name for f in folder.iterdir() if f.suffix.lower() in PORTRAIT_TYPES}
+
+
 @app.get("/api/roster")
 def roster():
     return {"specialists": team.ROSTER, "captain_styles": list(team.CAPTAIN_STYLES),
-            "help_modes": list(team.HELP_MODES), "languages": config.LANGUAGES, "model": config.MODEL_NAME}
+            "help_modes": list(team.HELP_MODES), "languages": config.LANGUAGES, "model": config.MODEL_NAME,
+            "portraits": portraits()}
 
 
 # --- to-dos ----------------------------------------------------------------------
