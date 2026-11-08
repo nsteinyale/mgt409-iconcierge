@@ -115,13 +115,23 @@ async function boot() {
 }
 
 // ---------- sign in / sign up ----------
+// The team-around-the-table video behind the sign-in and setup screens.
+function pageVideo() {
+  return `<video class="page-video" src="/static/media/office_orbit.mp4" poster="/static/media/office_orbit_poster.jpg"
+    autoplay muted loop playsinline aria-hidden="true"></video><div class="page-video-shade" aria-hidden="true"></div>`;
+}
+
+function playPageVideo() {
+  const v = $(".page-video");
+  if (v && !matchMedia("(prefers-reduced-motion: reduce)").matches) v.play().catch(() => {});
+}
+
 function showAuth(mode) {
   const team = ["captain_a", ...SPECIALISTS].map(id => `<div class="avatar">${avatarSVG(id)}</div>`).join("");
   root.innerHTML = `
+  ${pageVideo()}
   <div class="auth-wrap"><div class="auth-card">
     <div class="auth-hero">
-      <video class="hero-video" src="/static/media/office_orbit.mp4" poster="/static/media/office_orbit_poster.jpg"
-        autoplay muted loop playsinline aria-hidden="true"></video>
       <div class="brand">i<span>Concierge</span></div>
       <p>${esc(t("tagline"))}</p>
       <div class="team-row">${team}</div>
@@ -143,6 +153,7 @@ function showAuth(mode) {
       </form>
     </div>
   </div></div>`;
+  playPageVideo();
   $(".lang-select").onchange = e => { setLang(e.target.value); showAuth(mode); };
   $$(".tabs button").forEach(b => b.onclick = () => showAuth(b.dataset.mode));
   $("#auth-form").onsubmit = async e => {
@@ -219,13 +230,14 @@ function showWizard(draft, step) {
   } else {
     body = `<div id="profile-scope">${profileFields(draft.profile)}</div>`;
   }
-  root.innerHTML = `<div class="auth-wrap"><div class="wizard">
+  root.innerHTML = `${pageVideo()}<div class="auth-wrap"><div class="wizard">
     <div class="steps">${[1, 2, 3].map(i => `<div class="${i <= step ? "on" : ""}"></div>`).join("")}</div>
     <h2>${esc(t(titles[step]))}</h2>${body}
     <div class="error" id="wiz-error"></div>
     <div class="wizard-nav"><button class="btn ghost" id="wiz-back">${esc(t("back"))}</button>
       <button class="btn gold" id="wiz-next">${esc(step === 3 ? t("finish") : t("next"))}</button></div>
   </div></div>`;
+  playPageVideo();
   $$("[data-mode]").forEach(b => b.onclick = () => { s.help_mode = b.dataset.mode; showWizard(draft, step); });
   $$("[data-look]").forEach(b => b.onclick = () => { s.captain_name = $("#cname").value; s.captain_avatar = b.dataset.look; showWizard(draft, step); });
   $$("[data-style]").forEach(b => b.onclick = () => { s.captain_name = $("#cname").value; s.captain_style = b.dataset.style; showWizard(draft, step); });
@@ -262,6 +274,8 @@ async function showApp() {
     </header>
     <div class="main">
       <section class="panel stage" aria-label="${esc(t("tab_office"))}">
+        <video class="stage-video" src="/static/media/team_meeting.mp4" poster="/static/media/team_meeting_poster.jpg"
+          muted loop playsinline preload="none" aria-hidden="true"></video>
         <div class="stage-head"><h2>${esc(t("tab_office"))}</h2>
           <div class="rt-tools"><div class="legend">${["assign", "tool", "memo", "note", "handoff"].map(k =>
             `<span><i style="background:${PING_COLORS[k]}"></i>${esc(t("lg_" + k))}</span>`).join("")}</div>
@@ -363,6 +377,7 @@ async function send() {
   const question = box.value.trim();
   if (!question || state.busy) return;
   state.busy = true;
+  stageLive(true);
   $("#send").disabled = true;
   box.value = ""; box.style.height = "auto";
   const chat = $("#chat");
@@ -439,6 +454,7 @@ async function send() {
   state.lastChecks = [];
   chat.scrollTop = chat.scrollHeight;
   state.busy = false;
+  stageLive(false);
   $("#send").disabled = false;
   if ($("#replay")) $("#replay").disabled = !(state.lastEvents || []).length;
   setDesk("captain", "idle");
@@ -509,17 +525,32 @@ function animate(ev) {
   }
 }
 
+// While the team is working, the meeting video fades in behind the round table (not for reduced-motion users).
+function stageLive(on) {
+  const stage = $(".stage"), video = $(".stage-video");
+  if (!stage || !video) return;
+  if (on && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    clearTimeout(stage._off);
+    stage.classList.add("live");
+    video.play().catch(() => {});
+  } else if (!on) {
+    stage._off = setTimeout(() => { stage.classList.remove("live"); setTimeout(() => video.pause(), 900); }, 1200);
+  }
+}
+
 async function replay() {
   const events = state.lastEvents || [];
   if (!events.length || state.busy) return;
   let prev = 0;
+  stageLive(true);
   for (const ev of events) {
-    if (!RoundTable.ready) return;
+    if (!RoundTable.ready) break;
     const gap = Math.min(1200, Math.max(0, (ev.t - prev) * 1000 / 2));
     prev = ev.t;
     if (gap) await new Promise(r => setTimeout(r, gap));
     animate(ev);
   }
+  if (!state.busy) stageLive(false);
 }
 
 function pushFeed(item) {

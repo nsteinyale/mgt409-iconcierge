@@ -324,3 +324,26 @@ a { color: var(--navy-2); }
 .auth-hero .team-row .avatar:first-child { margin-left: 0; }
 .auth-hero .team-row .ai-badge { display: none; }
 .look-grid { display: grid; grid-template-columns: repeat(4, max-content); gap: .7rem; }
+
+/* ---------- full-screen meeting video on sign-in and setup ---------- */
+.page-video { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -2; }
+.page-video-shade { position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(ellipse at 50% 45%, rgba(20, 33, 61, .45) 0%, rgba(20, 33, 61, .78) 70%, rgba(13, 22, 42, .9) 100%); }
+body:has(.page-video) { background: #14213d; }
+.auth-card, .wizard { box-shadow: 0 20px 60px rgba(0, 0, 0, .45); }
+.auth-hero { background: rgba(20, 33, 61, .55); backdrop-filter: blur(3px); }
+.auth-hero::before { background: linear-gradient(160deg, rgba(20, 33, 61, .55), rgba(34, 51, 92, .25)); }
+.hero-video { display: none; }
+@media (prefers-reduced-motion: reduce) { .page-video { display: none; } body:has(.page-video-shade) { background: #14213d url(/static/media/office_orbit_poster.jpg) center / cover fixed; } }
+
+/* ---------- live meeting video behind the round table ---------- */
+.stage { position: relative; overflow: hidden; isolation: isolate; }
+.stage-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;
+  opacity: 0; transition: opacity .9s ease; }
+.stage::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .9s ease;
+  background: linear-gradient(180deg, rgba(255, 253, 248, .55) 0%, rgba(255, 253, 248, .25) 45%, rgba(255, 253, 248, .6) 100%); }
+.stage.live .stage-video { opacity: .9; }
+.stage.live::after { opacity: 1; }
+.stage.live .rt-name, .stage.live .stage-head h2 { text-shadow: 0 1px 2px #fff; }
+.stage.live .rt-role, .stage.live .rt-status { background: rgba(255, 255, 255, .85); border-radius: 6px; }
+.stage.live .stage-head h2, .stage.live .stage-head .legend { background: rgba(255, 255, 255, .88); border-radius: 999px; padding: .1rem .6rem; }
