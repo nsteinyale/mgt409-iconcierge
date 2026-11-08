@@ -78,6 +78,16 @@ CRISIS_REPLY = {
 }
 
 
+BUDGET_REPLY = {
+    "en": "I stopped the team because this question was about to pass its spending limit. Could you split it into "
+          "smaller questions?",
+    "es": "Detuve al equipo porque esta pregunta iba a superar su límite de gasto. ¿Puedes dividirla en preguntas más pequeñas?",
+    "zh": "这个问题即将超出单次花费上限，所以我让团队停下了。可以把它拆成几个小问题吗？",
+    "pt": "Parei a equipe porque esta pergunta ia passar do limite de gasto. Você pode dividi-la em perguntas menores?",
+    "fr": "J'ai arrêté l'équipe car cette question allait dépasser sa limite de dépense. Pouvez-vous la découper en questions plus petites ?",
+    "bn": "এই প্রশ্নটি খরচের সীমা ছাড়িয়ে যাচ্ছিল, তাই দলকে থামিয়েছি। প্রশ্নটি কয়েকটি ছোট প্রশ্নে ভাগ করবেন?",
+}
+
 BLOCKED_REPLY = {
     "en": "I can't help with that request. I'm glad to help with questions about money, housing, taxes, insurance, "
           "benefits or legal problems.",

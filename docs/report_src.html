@@ -171,7 +171,7 @@
   <tr><td class="num">24.9 s</td><td>Captain</td><td>Summary: three options (keep the reserve; use only savings above it; compare term life for both adults), a shared observation ($40/month difference between $6,000 and $12,000 down) and when to see a HUD counselor or licensed agent. Three to-dos added. Output guard: no issues.</td></tr>
 </table>
 <p class="small">Total: 13 AI calls · 21,462 input tokens (7,531 cached) · 3,118 output tokens · <b>$0.0030</b> · 24.9 seconds.</p>
-<figure><img src="{{IMG:07_round_table-2.jpg}}" alt="The round-table office replaying a run"><figcaption>The round-table office replaying a run: Ava's calculator pings to the toolbox in the middle (blue), her findings to Rosa (green) and the hand-off to Ari (purple), with speech bubbles; teammates not on the question are dimmed.</figcaption></figure>
+<figure><img src="{{IMG:07_round_table-3.jpg}}" alt="The round-table office during a live run"><figcaption>The office during a live run ("We're moving to another state…"): the meeting video plays behind the table, Leo, Marcus and Grace ping the toolbox (blue), each seat shows its running cost, and the spend meter (right) has counted up to $0.00174 of the $0.01 cap with token counts underneath. Priya, not on this question, is dimmed.</figcaption></figure>
 <div class="two">
   <figure><img src="{{IMG:04_answer_huddle_checks.jpg}}" alt="Answer with huddle notes and safety checks"><figcaption>A finished run: answer with sources, to-dos and the 8-check safety footer; huddle notes on the right.</figcaption></figure>
   <figure><img src="{{IMG:08_drafts.jpg}}" alt="Ari's draft in the Drafts tab"><figcaption>Ari's draft to a landlord asking for an itemized deposit list: editable, with Gmail, Outlook, email-app and "Copy for my Claude / ChatGPT" hand-offs. Nothing is sent.</figcaption></figure>
@@ -179,7 +179,7 @@
 
 <!-- 5. Tokenomics -->
 <h2>5. Tokenomics</h2>
-<p>Every model call goes through one function (<code>llm.chat</code>) that records input, cached and output tokens, cost and seconds in a <code>usage</code> table. Costs use the course price list (Lecture 11): $0.10 per 1M input tokens, $0.01 per 1M cached input tokens and $0.50 per 1M output tokens. All numbers below are measured, not estimated.</p>
+<p>Every model call goes through one function (<code>llm.chat</code>) that records input, cached and output tokens, cost and seconds in a <code>usage</code> table. Costs use the course price list (Lecture 11): $0.10 per 1M input tokens, $0.01 per 1M cached input tokens, $0.125 per 1M cache-write tokens and $0.50 per 1M output tokens. All numbers below are measured, not estimated. The family sees spend live, too: a Lecture 11-style <b>spend meter</b> on the round table counts the question's dollars up as each call is billed, fills a tube toward a hard <b>$0.01 cap per question</b>, shows input/cached/output tokens, and puts each person's running cost under their seat with a coin flash on every charge.</p>
 <h3>Measured runs (November 7, 2026)</h3>
 <table>
   <tr><th>#</th><th>Question</th><th class="num">Specialists</th><th class="num">AI calls</th><th class="num">Input (cached)</th><th class="num">Output</th><th class="num">Cost</th><th class="num">Time</th></tr>
@@ -223,7 +223,7 @@
   <tr><td><b>Turn reasoning off for tool calls and cap source searches at 2 per specialist</b> (same question, before vs. after)</td><td>AI calls 14 → 11; input tokens 37,821 → 15,911 (−58%); output 4,610 → 2,042 (−56%); <b>cost $0.00459 → $0.00189 (−59%)</b>; time 43.2 s → 23.8 s (−45%). Before the cap, one specialist ran 9 searches in a single question.</td></tr>
   <tr><td><b>Prompt caching</b> (stable system prompts first, growing tool history after)</td><td>39% of all input tokens were served from cache at one-tenth the price, saving $0.0043 of $0.0208 (21%) across the 9 runs.</td></tr>
   <tr><td><b>Answer in code when no AI is needed</b></td><td>Crisis messages: 0 calls, $0. Requests the provider's filter blocks: 0 billed calls. Harmful requests: 1 call ($0.0001) and no specialists.</td></tr>
-  <tr><td><b>Hard limits</b>: 3 specialists, 4 tool rounds, small output caps (huddle 200 tokens, plan 900)</td><td>Worst run seen: 14 calls, $0.0030. No runaway loops in any test.</td></tr>
+  <tr><td><b>Hard limits</b>: 3 specialists, 4 tool rounds, small output caps (huddle 200 tokens, plan 900), and a <b>$0.01 spending cap per question</b> that stops the team and tells the family</td><td>Worst run seen: 18 calls, $0.0036, about a third of the cap. No runaway loops in any test.</td></tr>
   <tr><td><b>Only the specialists who are needed</b></td><td>Single-domain questions use 1 specialist and 4 calls ($0.0008–$0.0013), about half the cost of multi-domain ones.</td></tr>
 </table>
 
@@ -244,7 +244,7 @@
   <tr><td>Ari is steered into emailing a scammer or leaking data</td><td>Ari has no send tool at all: drafts only. Every draft's recipient, subject and body pass the output guard, so an address, link or amount planted in a flagged document is removed and private numbers are redacted. Ari may not invent addresses.</td><td>Containment + output</td></tr>
   <tr><td>Families mistake the AI team for real licensed professionals</td><td>Every portrait is a fictional, AI-generated person (no real faces or stock models), each carries an "AI" badge, and every screen carries "General information, not legal, tax or investment advice." Image sources are listed in <code>frontend/portraits/CREDITS.md</code>.</td><td>Design</td></tr>
   <tr><td>Overreach: telling families what to do</td><td>Prompts require options, not orders; "you should / must" wording is counted on every answer.</td><td>Audit</td></tr>
-  <tr><td>Runaway cost or abuse</td><td>No internet, email or payment tools; per-specialist tool permissions; per-question caps; 30 questions/hour and 30 uploads/day per family; 5 wrong passcodes lock an account for 15 minutes; passcodes hashed (PBKDF2, 200,000 rounds).</td><td>Containment</td></tr>
+  <tr><td>Runaway cost or abuse</td><td>No internet, email or payment tools; per-specialist tool permissions; per-question caps including a $0.01 spending cap (live spend meter on screen); 30 questions/hour and 30 uploads/day per family; 5 wrong passcodes lock an account for 15 minutes; passcodes hashed (PBKDF2, 200,000 rounds).</td><td>Containment</td></tr>
 </table>
 
 <h3>Defenses shown working</h3>

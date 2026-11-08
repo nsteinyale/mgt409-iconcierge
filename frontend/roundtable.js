@@ -38,6 +38,7 @@ const RoundTable = (() => {
             <div class="rt-name">${info.name(id)}</div>
             <div class="rt-role">${info.role(id)}</div>
             <div class="rt-status">${info.status("idle")}</div>
+            <div class="rt-cost" aria-label="spend"></div>
             <div class="rt-bubble"></div>
           </div>`).join("")}
       </div>`;
@@ -133,5 +134,16 @@ const RoundTable = (() => {
     });
   }
 
-  return { render, setStatus, bench, talk, bubble, centerNote, ping, get ready() { return !!scene && scene.isConnected; } };
+  // Running spend under a seat, with a coin flash each time that person is billed.
+  function cost(id, text) {
+    const el = seats[id]?.querySelector(".rt-cost");
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle("on", !!text);
+    seats[id].classList.remove("billed");
+    void seats[id].offsetWidth;            // restart the animation
+    if (text) seats[id].classList.add("billed");
+  }
+
+  return { render, setStatus, bench, talk, bubble, centerNote, ping, cost, get ready() { return !!scene && scene.isConnected; } };
 })();

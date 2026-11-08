@@ -37,7 +37,9 @@ MAX_DOC_CHARS = 12000          # characters of a document a specialist can read 
 # Course price list (Lecture 11), dollars per 1M tokens.
 PRICE_IN = 0.10
 PRICE_CACHED_IN = 0.01
+PRICE_CACHE_WRITE = 0.125
 PRICE_OUT = 0.50
+MAX_COST_PER_QUESTION = 0.01   # dollars; the team stops if one question would cost more (5x the worst run seen)
 
 SESSION_COOKIE = "ic_session"
 SESSION_DAYS = 14

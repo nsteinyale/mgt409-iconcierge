@@ -111,7 +111,9 @@ class Run:
         self.usage["calls"] += 1
         for k in ("prompt_tokens", "cached_tokens", "completion_tokens", "cost"):
             self.usage[k] += usage[k]
-        self.emit("usage", agent=agent, step=step, **usage)
+        self.emit("usage", agent=agent, step=step, run_cost=round(self.usage["cost"], 6), **usage)
+        if self.usage["cost"] > config.MAX_COST_PER_QUESTION:
+            raise llm.BudgetExceeded(f"${self.usage['cost']:.4f} > ${config.MAX_COST_PER_QUESTION}")
         return message
 
     def guard(self, finding: safety.Finding) -> None:
@@ -390,7 +392,7 @@ Give 0 to 5 todos."""
     # -- the whole run --------------------------------------------------------------
     async def execute(self) -> None:
         try:
-            self.emit("run_started", run_id=self.run_id, captain=self.captain_name)
+            self.emit("run_started", run_id=self.run_id, captain=self.captain_name, budget=config.MAX_COST_PER_QUESTION)
             db.add_message(self.family_id, "family", self.question, self.run_id)
             for f in self.input_check.findings:
                 self.guard(f)
@@ -414,6 +416,8 @@ Give 0 to 5 todos."""
                                               for a in advisors), return_exceptions=True)
             memos = []
             for a, r in zip(advisors, results):
+                if isinstance(r, llm.BudgetExceeded):
+                    raise r
                 if isinstance(r, llm.ContentFiltered):
                     self.guard(safety.Finding("output", "provider_blocked",
                                               f"{a['specialist']}: the provider's content filter stopped this step"))
@@ -446,6 +450,11 @@ Give 0 to 5 todos."""
             for t in summary["todos"]:
                 todo = db.add_todo(self.family_id, t["title"], t["owner"], t["due_hint"], self.run_id)
                 self.emit("todo_added", todo=todo)
+        except llm.BudgetExceeded as exc:
+            self.guard(safety.Finding("access", "budget_cap", f"Stopped at {exc} for one question"))
+            reply = safety.BUDGET_REPLY.get(self.settings.get("language", "en"), safety.BUDGET_REPLY["en"])
+            self.emit("captain_summary", answer=reply, sources=[], todos=[])
+            db.add_message(self.family_id, "captain", reply, self.run_id)
         except llm.ContentFiltered:
             # The provider's own filter refused the request: a second, independent layer of defense.
             self.guard(safety.Finding("input", "provider_blocked",

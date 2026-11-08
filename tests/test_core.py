@@ -67,6 +67,16 @@ class Calculators(unittest.TestCase):
         self.assertEqual(r["future_value"], 2_200)
 
 
+class Pricing(unittest.TestCase):
+    def test_cost_counts_cached_reads_and_cache_writes(self):
+        from types import SimpleNamespace as N
+        from backend import llm
+        response = N(usage=N(prompt_tokens=1_000_000, completion_tokens=1_000_000,
+                             prompt_tokens_details=N(cached_tokens=400_000, cache_write_tokens=100_000)))
+        # 500k plain x $0.10 + 400k cached x $0.01 + 100k cache-write x $0.125 + 1M out x $0.50 per 1M
+        self.assertAlmostEqual(llm.usage_of(response, 1.0)["cost"], 0.05 + 0.004 + 0.0125 + 0.5)
+
+
 class ToolPermissions(unittest.TestCase):
     def test_attorney_cannot_use_tax_tool(self):
         out = tools.run_tool("attorney", "estimate_federal_income_tax", '{"gross_income": 1}', CTX)

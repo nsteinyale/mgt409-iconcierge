@@ -347,3 +347,28 @@ body:has(.page-video) { background: #14213d; }
 .stage.live .rt-name, .stage.live .stage-head h2 { text-shadow: 0 1px 2px #fff; }
 .stage.live .rt-role, .stage.live .rt-status { background: rgba(255, 255, 255, .85); border-radius: 6px; }
 .stage.live .stage-head h2, .stage.live .stage-head .legend { background: rgba(255, 255, 255, .88); border-radius: 999px; padding: .1rem .6rem; }
+
+/* ---------- live spend meter on the stage ---------- */
+.spend { position: absolute; right: 14px; top: 42px; width: 112px; z-index: 5; display: flex; flex-direction: column;
+  align-items: center; gap: .2rem; background: rgba(255, 255, 255, .9); border: 1.5px solid var(--line); border-radius: 14px;
+  padding: .45rem .4rem .5rem; box-shadow: var(--shadow); font-variant-numeric: tabular-nums; }
+.spend-label { font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+.spend-total { font-size: 1.05rem; font-weight: 800; color: var(--navy); }
+.spend-tube { position: relative; width: 22px; height: 120px; border-radius: 12px; background: #eef1f6;
+  border: 2px solid #d9dee8; overflow: hidden; }
+.spend-fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0;
+  background: linear-gradient(0deg, #2e8b57, #d9a441); transition: height .2s; }
+.spend.hot .spend-fill { background: linear-gradient(0deg, #d9a441, #c0392b); }
+.spend-cap { position: absolute; left: -2px; right: -2px; top: 0; border-top: 2px dashed var(--warn); }
+.spend-capnote { font-size: .6rem; color: var(--muted); text-align: center; line-height: 1.2; }
+.spend-tokens { font-size: .58rem; color: var(--muted); text-align: center; line-height: 1.3; }
+.rt-cost { font-size: .58rem; font-weight: 700; color: var(--ok); background: #eef8f1; border-radius: 999px; padding: 0 .35rem;
+  margin-top: .1rem; opacity: 0; font-variant-numeric: tabular-nums; }
+.rt-cost.on { opacity: 1; }
+.rt-seat.billed .rt-cost { animation: coin .6s ease-out; }
+.rt-seat.billed .rt-person::after { content: "🪙"; position: absolute; left: 50%; top: -6px; transform: translateX(-50%);
+  font-size: .9rem; animation: coinup .7s ease-out forwards; pointer-events: none; }
+.rt-person { position: relative; }
+@keyframes coin { 0% { transform: scale(1.35); background: var(--gold-soft); } 100% { transform: scale(1); } }
+@keyframes coinup { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -22px); } }
+@media (max-width: 1100px) { .spend { transform: scale(.85); transform-origin: top right; } }

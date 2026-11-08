@@ -281,6 +281,13 @@ async function showApp() {
             `<span><i style="background:${PING_COLORS[k]}"></i>${esc(t("lg_" + k))}</span>`).join("")}</div>
           <button id="replay" disabled>${esc(t("replay"))}</button></div></div>
         <div id="rt" class="stage-table"></div>
+        <aside class="spend" aria-live="off">
+          <div class="spend-label">${esc(t("spend_title"))}</div>
+          <div class="spend-total">$0</div>
+          <div class="spend-tube" role="meter" aria-valuemin="0"><div class="spend-fill"></div><div class="spend-cap"></div></div>
+          <div class="spend-capnote"></div>
+          <div class="spend-tokens"></div>
+        </aside>
       </section>
       <section class="panel chat-window">
         <div class="chat-head">${avatarHTML("captain", "", "captain-face")}
@@ -476,9 +483,64 @@ function switchTab(tab) {
   renderSide();
 }
 
+// ---------- live spend meter (Lecture 11 style) ----------
+const meter = { total: 0, shown: 0, cap: 0.01, perAgent: {}, calls: 0, tin: 0, tcached: 0, tout: 0, raf: 0 };
+
+function fmtUsd(v) {
+  const x = Number(v || 0);
+  if (x === 0) return "$0";
+  if (x < 0.01) return "$" + x.toFixed(5);
+  if (x < 1) return "$" + x.toFixed(4);
+  return "$" + x.toFixed(2);
+}
+
+function drawMeter() {
+  const total = $(".spend-total"), fill = $(".spend-fill");
+  if (!total || !fill) return;
+  // Count up smoothly from the shown value to the real total.
+  cancelAnimationFrame(meter.raf);
+  const from = meter.shown, to = meter.total, start = performance.now();
+  const step = now => {
+    const k = Math.min(1, (now - start) / 600);
+    meter.shown = from + (to - from) * (1 - Math.pow(1 - k, 3));
+    total.textContent = fmtUsd(meter.shown);
+    const pct = meter.shown > 0 ? Math.max(3, Math.min(100, meter.shown / meter.cap * 100)) : 0;
+    fill.style.height = pct + "%";
+    if (k < 1) meter.raf = requestAnimationFrame(step);
+  };
+  if (document.hidden) step(start + 600);   // animation frames pause in hidden tabs: jump straight to the value
+  else meter.raf = requestAnimationFrame(step);
+  $(".spend")?.classList.toggle("hot", meter.total / meter.cap > 0.75);
+  $(".spend-capnote").textContent = t("spend_cap", { cap: fmtUsd(meter.cap), calls: meter.calls });
+  $(".spend-tokens").innerHTML = `${meter.tin.toLocaleString()} ${esc(t("tok_in"))}<br>${meter.tcached.toLocaleString()} ${esc(t("tok_cached"))}<br>${meter.tout.toLocaleString()} ${esc(t("tok_out"))}`;
+}
+
+function meterEvent(ev) {
+  if (ev.type === "run_started") {
+    Object.assign(meter, { total: 0, shown: 0, perAgent: {}, calls: 0, tin: 0, tcached: 0, tout: 0 });
+    if (ev.budget) meter.cap = ev.budget;
+    ["captain", ...SPECIALISTS].forEach(id => RoundTable.cost(id, ""));
+    drawMeter();
+  } else if (ev.type === "usage") {
+    meter.calls += 1;
+    meter.tin += ev.prompt_tokens; meter.tcached += ev.cached_tokens; meter.tout += ev.completion_tokens;
+    meter.total = ev.run_cost != null ? ev.run_cost : meter.total + ev.cost;
+    const who = ev.agent in state.roster || ev.agent === "captain" ? ev.agent : null;
+    if (who) {
+      meter.perAgent[who] = (meter.perAgent[who] || 0) + ev.cost;
+      RoundTable.cost(who, fmtUsd(meter.perAgent[who]));
+    }
+    drawMeter();
+  } else if (ev.type === "done" && ev.totals) {
+    meter.total = ev.totals.cost;
+    drawMeter();
+  }
+}
+
 // Everything the round table shows for one event. Used live and for Replay.
 function animate(ev) {
   if (!RoundTable.ready) return;
+  meterEvent(ev);
   const short = s => String(s || "").replace(/\s+/g, " ").trim();
   switch (ev.type) {
     case "run_started":

@@ -13,6 +13,10 @@ from . import config, db
 _client: AsyncOpenAI | None = None
 
 
+class BudgetExceeded(Exception):
+    """One question's spend passed MAX_COST_PER_QUESTION; the team stops."""
+
+
 class ContentFiltered(Exception):
     """The model provider's own safety filter refused the request (e.g. a jailbreak attempt)."""
 
@@ -31,10 +35,13 @@ def usage_of(response: Any, seconds: float) -> dict:
     completion = getattr(u, "completion_tokens", 0) or 0
     details = getattr(u, "prompt_tokens_details", None)
     cached = getattr(details, "cached_tokens", 0) or 0
-    cost = ((prompt - cached) * config.PRICE_IN + cached * config.PRICE_CACHED_IN
+    written = getattr(details, "cache_write_tokens", 0) or 0
+    # Input tokens include cached reads and cache writes; only the remainder is billed at the plain rate.
+    uncached = max(0, prompt - cached - written)
+    cost = (uncached * config.PRICE_IN + cached * config.PRICE_CACHED_IN + written * config.PRICE_CACHE_WRITE
             + completion * config.PRICE_OUT) / 1_000_000
-    return {"prompt_tokens": prompt, "cached_tokens": cached, "completion_tokens": completion,
-            "cost": cost, "seconds": round(seconds, 2)}
+    return {"prompt_tokens": prompt, "cached_tokens": cached, "cache_write_tokens": written,
+            "completion_tokens": completion, "cost": cost, "seconds": round(seconds, 2)}
 
 
 async def chat(messages: list[dict], *, agent: str, step: str, run_id: int | None, family_id: int | None,
