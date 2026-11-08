@@ -13,6 +13,12 @@ const AGES = ["18–24", "25–34", "35–44", "45–54", "55–64", "65+"];
 const GOALS = ["home", "taxes", "debt", "save", "invest", "insurance", "benefits", "legal", "move", "retire", "college"];
 const STYLES = ["warm", "professional", "upbeat", "straight"];
 const MODES = ["family", "young_adult", "general"];
+const LEVELS = ["eli5", "beginner", "intermediate", "advanced", "professional"];
+
+function levelSelect(current, id) {
+  return `<select id="${id}" class="level-select" aria-label="${esc(t("level_label"))}">${LEVELS.map(l =>
+    `<option value="${l}" ${(current || "beginner") === l ? "selected" : ""}>${esc(t("lvl_" + l))}</option>`).join("")}</select>`;
+}
 
 const state = {
   me: null, roster: {}, todos: [], docs: [], drafts: [], attached: [], busy: false, tab: "office",
@@ -166,7 +172,7 @@ function showAuth(mode) {
       if (!/^[a-z0-9][a-z0-9_.-]{2,31}$/.test(handle)) return err.textContent = t("err_bad_handle");
       if (passcode.length < 6) return err.textContent = t("err_short_passcode");
       if (passcode !== $("#passcode2").value) return err.textContent = t("err_mismatch");
-      showWizard({ handle, passcode, settings: { language: LANG, help_mode: "family", captain_style: "warm", captain_avatar: "captain_a", captain_name: "" }, profile: {} }, 1);
+      showWizard({ handle, passcode, settings: { language: LANG, help_mode: "family", captain_style: "warm", captain_avatar: "captain_a", captain_name: "", explain_level: "beginner" }, profile: {} }, 1);
       return;
     }
     try {
@@ -221,7 +227,8 @@ function showWizard(draft, step) {
   if (step === 1) {
     body = `<div class="choice-grid">${MODES.map(m => `<button type="button" class="choice ${s.help_mode === m ? "on" : ""}" data-mode="${m}">
       <strong>${esc(t("help_" + m))}</strong><span>${esc(t("help_" + m + "_d"))}</span></button>`).join("")}</div>
-      <div class="field"><label>${esc(t("language"))}</label>${langSelect("lang-select wiz-lang")}</div>`;
+      <div class="row"><div class="field"><label>${esc(t("language"))}</label>${langSelect("lang-select wiz-lang")}</div>
+      <div class="field"><label for="wlevel">${esc(t("level_label"))}</label>${levelSelect(s.explain_level, "wlevel")}</div></div>`;
   } else if (step === 2) {
     body = `<div class="field"><label>${esc(t("captain_look"))}</label><div class="look-grid">${captainChoices().map(a =>
       `<button type="button" class="look ${s.captain_avatar === a ? "on" : ""}" data-look="${a}"><div class="avatar">${avatarSVG(a)}</div></button>`).join("")}</div></div>
@@ -242,6 +249,8 @@ function showWizard(draft, step) {
   $$("[data-mode]").forEach(b => b.onclick = () => { s.help_mode = b.dataset.mode; showWizard(draft, step); });
   $$("[data-look]").forEach(b => b.onclick = () => { s.captain_name = $("#cname").value; s.captain_avatar = b.dataset.look; showWizard(draft, step); });
   $$("[data-style]").forEach(b => b.onclick = () => { s.captain_name = $("#cname").value; s.captain_style = b.dataset.style; showWizard(draft, step); });
+  const wlevel = $("#wlevel");
+  if (wlevel) wlevel.onchange = e => { s.explain_level = e.target.value; };
   const wl = $(".wiz-lang");
   if (wl) wl.onchange = e => { setLang(e.target.value); s.language = LANG; showWizard(draft, step); };
   if (step === 3) wireGoalChips($("#profile-scope"));
@@ -292,7 +301,8 @@ async function showApp() {
       </section>
       <section class="panel chat-window">
         <div class="chat-head">${avatarHTML("captain", "", "captain-face")}
-          <div><h2>${esc(personName("captain"))} <span class="online" aria-hidden="true"></span></h2><small>${esc(t("role_captain"))} · ${esc(t("style_" + me.settings.captain_style))}</small></div></div>
+          <div><h2>${esc(personName("captain"))} <span class="online" aria-hidden="true"></span></h2><small>${esc(t("role_captain"))} · ${esc(t("style_" + me.settings.captain_style))}</small></div>
+          <label class="level-pick" title="${esc(t("level_label"))}"><span>🎓 ${esc(t("level_label"))}</span>${levelSelect(me.settings.explain_level, "level")}</label></div>
         <div class="chat-log" id="chat"></div>
         <div class="composer">
           <div class="attached" id="attached"></div>
@@ -322,6 +332,9 @@ async function showApp() {
   ask.addEventListener("input", () => { ask.style.height = "auto"; ask.style.height = Math.min(ask.scrollHeight, 160) + "px"; });
   ask.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
   $("#send").onclick = send;
+  $("#level").onchange = async e => {
+    state.me = await api("/api/me", { method: "PUT", body: { settings: { explain_level: e.target.value } } }).catch(() => state.me);
+  };
   $("#attach-btn").onclick = () => { state.tab = "docs"; $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "docs")); renderSide(); };
   SPECIALISTS.concat("captain").forEach(id => state.desk[id] = state.desk[id] || "idle");
   await Promise.all([loadChat(), loadTodos(), loadDocs(), loadDrafts()]);
@@ -817,7 +830,8 @@ function renderSide() {
       <div class="look-grid">${captainChoices().map(a => `<button type="button" class="look ${s.captain_avatar === a ? "on" : ""}" data-look="${a}"><div class="avatar">${avatarSVG(a)}</div></button>`).join("")}</div>
       <div class="row"><div class="field"><label>${esc(t("captain_name"))}</label><input id="cname" maxlength="30" value="${esc(s.captain_name)}"></div>
       <div class="field"><label>${esc(t("captain_style"))}</label><select id="cstyle">${STYLES.map(st => `<option value="${st}" ${s.captain_style === st ? "selected" : ""}>${esc(t("style_" + st))}</option>`).join("")}</select></div>
-      <div class="field"><label>${esc(t("step_help"))}</label><select id="cmode">${MODES.map(m => `<option value="${m}" ${s.help_mode === m ? "selected" : ""}>${esc(t("help_" + m))}</option>`).join("")}</select></div></div>
+      <div class="field"><label>${esc(t("step_help"))}</label><select id="cmode">${MODES.map(m => `<option value="${m}" ${s.help_mode === m ? "selected" : ""}>${esc(t("help_" + m))}</option>`).join("")}</select></div>
+      <div class="field"><label>${esc(t("level_label"))}</label>${levelSelect(s.explain_level, "plevel")}</div></div>
       <button class="btn" id="save-profile">${esc(t("save"))}</button> <span id="saved" class="stats"></span>
       <hr style="margin:1.5rem 0;border:0;border-top:1px solid var(--line)">
       <button class="btn small danger" id="delete-account">${esc(t("delete_account"))}</button>`;
@@ -826,7 +840,7 @@ function renderSide() {
     $$("[data-look]").forEach(b => b.onclick = () => { look = b.dataset.look; $$("[data-look]").forEach(x => x.classList.toggle("on", x === b)); });
     $("#save-profile").onclick = async () => {
       state.me = await api("/api/me", { method: "PUT", body: { profile: readProfile($("#profile-scope")),
-        settings: { captain_name: $("#cname").value.trim(), captain_style: $("#cstyle").value, help_mode: $("#cmode").value, captain_avatar: look } } });
+        settings: { captain_name: $("#cname").value.trim(), captain_style: $("#cstyle").value, help_mode: $("#cmode").value, captain_avatar: look, explain_level: $("#plevel").value } } });
       await showApp();
       state.tab = "profile"; $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "profile")); renderSide();
       $("#saved").textContent = "✓ " + t("saved");

@@ -17,7 +17,7 @@ from . import auth, config, db, llm, safety, team
 app = FastAPI(title="iConcierge: Your Personal Family Office")
 db.init()
 
-SETTINGS_KEYS = {"language", "help_mode", "captain_name", "captain_style", "captain_avatar"}
+SETTINGS_KEYS = {"language", "help_mode", "captain_name", "captain_style", "captain_avatar", "explain_level"}
 PROFILE_KEYS = {"state", "adults", "children", "age_range", "income_range", "employment", "housing", "goals", "notes"}
 TEXT_TYPES = {"text/plain", "text/markdown", "text/csv"}
 IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp"}
@@ -31,6 +31,8 @@ def clean_settings(raw: dict) -> dict:
         s["language"] = "en"
     if s.get("help_mode") not in team.HELP_MODES:
         s["help_mode"] = "general"
+    if s.get("explain_level") not in team.EXPLAIN_LEVELS:
+        s["explain_level"] = "beginner"
     if s.get("captain_style") not in team.CAPTAIN_STYLES:
         s["captain_style"] = "warm"
     s["captain_name"] = (s.get("captain_name") or "").strip() or "Captain"

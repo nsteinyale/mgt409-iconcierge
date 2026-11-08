@@ -54,6 +54,33 @@ HELP_MODES = {
     "general": "an adult who wants clear, practical guidance.",
 }
 
+EXPLAIN_LEVELS = {
+    "eli5": "Explain it like the reader is five: very short sentences (under 12 words), everyday words, one simple picture "
+            "or comparison (a piggy bank, a pizza cut into slices). No jargon: if a term like 'deduction' or 'taxable "
+            "income' is unavoidable, explain it in five words or fewer right away. Keep the whole answer under 150 "
+            "words. Still give the real numbers, rounded.",
+    "beginner": "Plain language for someone new to the topic. Short sentences. Define any term the first time you use it, "
+                "e.g. 'APR (the yearly interest rate)'.",
+    "intermediate": "Assume basic money and legal literacy. Define only specialized terms. Moderate detail.",
+    "advanced": "Use standard financial and legal terms without defining basics. Include more detail, the assumptions "
+                "behind each number, and edge cases.",
+    "professional": "Write for a practitioner (CPA, attorney, financial planner): precise terminology; the rules, rates and "
+                    "thresholds behind each number (e.g. bracket edges, marginal vs effective rate, wage base); form and "
+                    "program names where the sources support them; compact, with assumptions and caveats explicit.",
+}
+
+# The Captain's final answer layout, by explanation level.
+ANSWER_SHAPES = {
+    "default": "the answer in simple Markdown (## headings, - bullets, **bold**): a one-line framing, then 2-4 options "
+               "each with its numbers and trade-offs, then anything the team noticed together, then when a professional "
+               "helps. Under 350 words.",
+    "eli5": "a tiny explanation a five-year-old could follow: no headings, 3 to 5 very short sentences with one simple "
+            "picture (like pizza slices or a piggy bank), then at most 3 '- ' bullets with the choices and their rounded "
+            "numbers. Under 120 words.",
+    "professional": "a compact practitioner memo in Markdown: a one-line conclusion, then 2-4 options with the rules, "
+                    "thresholds and figures behind each, then assumptions and caveats, then referral points. Under 300 words.",
+}
+
 SHARED_RULES = """Rules for everyone on the team:
 - Options, not orders. Never tell the family what they must or should do, never say "do this first".
   Lay out options with trade-offs and numbers; the family decides.
@@ -160,7 +187,8 @@ class Run:
         return self.settings.get("captain_name") or "Captain"
 
     def rules(self) -> str:
-        return SHARED_RULES.format(language=_language(self.settings))
+        level = EXPLAIN_LEVELS.get(self.settings.get("explain_level", "beginner"), EXPLAIN_LEVELS["beginner"])
+        return SHARED_RULES.format(language=_language(self.settings)) + "\n- How to explain: " + level
 
     def history(self) -> str:
         turns = db.recent_messages(self.family_id, config.HISTORY_TURNS * 2)
@@ -353,10 +381,9 @@ send from their own email, and that nothing was sent. Do not repeat the full dra
 {self.rules()}
 
 Reply with JSON only:
-{{"answer": "the answer in simple Markdown (## headings, - bullets, **bold**): a one-line framing, then 2-4 options
-   each with its numbers and trade-offs, then anything the team noticed together, then when a professional helps.
+{{"answer": "{ANSWER_SHAPES.get(self.settings.get('explain_level', 'beginner'), ANSWER_SHAPES['default'])}
    Credit specialists by name. Cite sources only as [source-id] in square brackets; never write web addresses
-   or Markdown links. Under 350 words.",
+   or Markdown links.",
   "todos": [{{"title": "a neutral to-do the family MAY choose, phrased as a task not an order", "owner": "family or a specialist id", "due_hint": "e.g. 'before April 15' or ''"}}],
   "source_ids": ["only ids from this list: {', '.join(allowed) or 'none'}"]}}
 Give 0 to 5 todos."""

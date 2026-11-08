@@ -63,6 +63,9 @@ a topic under **"What do you want help with?"** (starting a company, planning a 
 home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 8, 2026
 took 4 min 13 s to install and answered its first question 17 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
 
+Use the **🎓 Explanations** menu in the chat header to pick how answers are written: *Explain like I'm 5*, Beginner
+(default), Intermediate, Advanced or Professional. It is also in setup and the Profile tab.
+
 The app uses `gpt-6-luna` through the course Portkey key. With a personal `OPENAI_API_KEY` instead, set
 `OPENAI_MODEL` too.
 
