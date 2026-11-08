@@ -438,5 +438,113 @@
   "topics": "student loans fafsa repayment college aid",
   "summary": "FAFSA, federal student loans and repayment options.",
   "checked": "2026-11-07: link opened"
+ },
+ {
+  "id": "irs-se-tax",
+  "title": "IRS: self-employment tax (Social Security and Medicare)",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/businesses/small-businesses-self-employed/self-employment-tax-social-security-and-medicare-taxes",
+  "specialists": [
+   "accountant"
+  ],
+  "topics": "self employment tax freelancer side business 1099 schedule se social security medicare",
+  "summary": "How self-employment tax works: rate, who pays it, and the deduction for half of it.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "irs-self-employed-center",
+  "title": "IRS: Self-Employed Individuals Tax Center",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/businesses/small-businesses-self-employed/self-employed-individuals-tax-center",
+  "specialists": [
+   "accountant",
+   "attorney"
+  ],
+  "topics": "self employed freelancer estimated taxes quarterly deadlines business expenses",
+  "summary": "Filing, estimated quarterly payments and recordkeeping for the self-employed.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "irs-ein",
+  "title": "IRS: get an Employer Identification Number (EIN)",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/businesses/small-businesses-self-employed/get-an-employer-identification-number",
+  "specialists": [
+   "attorney",
+   "accountant"
+  ],
+  "topics": "ein employer identification number start business register llc",
+  "summary": "Who needs an EIN and how to apply for one for free.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "sba-business-structure",
+  "title": "SBA: choose a business structure",
+  "agency": "SBA",
+  "url": "https://www.sba.gov/counseling/launch-your-business/",
+  "aliases": [
+   "https://www.sba.gov/business-guide/launch-your-business/choose-business-structure"
+  ],
+  "specialists": [
+   "attorney",
+   "accountant"
+  ],
+  "topics": "start company llc sole proprietorship corporation business structure launch register",
+  "summary": "Sole proprietorship, LLC and corporation compared, plus steps to launch a business.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "sba-business-plan",
+  "title": "SBA: write your business plan",
+  "agency": "SBA",
+  "url": "https://www.sba.gov/counseling/plan-your-business/",
+  "aliases": [
+   "https://www.sba.gov/business-guide/plan-your-business/write-your-business-plan"
+  ],
+  "specialists": [
+   "accountant",
+   "investor"
+  ],
+  "topics": "business plan startup costs funding small business planning",
+  "summary": "How to plan a small business: market, costs, funding and a business plan.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "usps-forward",
+  "title": "USPS: change of address / mail forwarding",
+  "agency": "USPS",
+  "url": "https://www.usps.com/manage/forward.htm",
+  "specialists": [
+   "housing"
+  ],
+  "topics": "move moving change of address mail forwarding new home",
+  "summary": "Forward your mail when you move.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "irs-address-change",
+  "title": "IRS: address changes",
+  "agency": "IRS",
+  "url": "https://www.irs.gov/faqs/irs-procedures/address-changes",
+  "specialists": [
+   "housing",
+   "accountant"
+  ],
+  "topics": "move moving new state address change irs form 8822 taxes",
+  "summary": "How to tell the IRS you moved.",
+  "checked": "2026-11-08: link opened"
+ },
+ {
+  "id": "ssa-cola-2026",
+  "title": "SSA: 2026 COLA and wage base fact sheet",
+  "agency": "SSA",
+  "url": "https://www.ssa.gov/news/en/cola/factsheets/2026.html",
+  "specialists": [
+   "accountant",
+   "benefits"
+  ],
+  "topics": "social security wage base 2026 cola benefits increase",
+  "summary": "2026 Social Security figures, including the $184,500 taxable wage base and the 2.8% COLA.",
+  "checked": "2026-11-08: site blocks automated checks; official page"
  }
 ]

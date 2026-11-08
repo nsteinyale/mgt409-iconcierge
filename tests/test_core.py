@@ -31,6 +31,16 @@ class Calculators(unittest.TestCase):
     def test_tax_rejects_unknown_status(self):
         self.assertIn("error", tools.estimate_federal_income_tax(CTX, 50_000, "head_of_household"))
 
+    def test_self_employment_tax_2026(self):
+        # $50,000 profit -> $46,175 taxed -> 12.4% = 5,725.70 and 2.9% = 1,339.08 -> 7,064.78
+        r = tools.estimate_self_employment_tax(CTX, 50_000)
+        self.assertEqual(r["self_employment_tax"], 7064.78)
+        self.assertEqual(r["deduction_for_half"], 3532.39)
+        # The Social Security part stops at the $184,500 wage base, counting W-2 wages first
+        capped = tools.estimate_self_employment_tax(CTX, 50_000, w2_wages=180_000)
+        self.assertAlmostEqual(capped["social_security_part"], 0.124 * 4_500, places=2)
+        self.assertEqual(tools.estimate_self_employment_tax(CTX, 300)["self_employment_tax"], 0.0)
+
     def test_mortgage_payment(self):
         # $320,000 at 6.5% for 30 years -> about $2,022.62 principal and interest
         r = tools.mortgage_payment(CTX, 350_000, 30_000, 6.5, 30)

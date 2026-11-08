@@ -17,14 +17,18 @@ from . import config, db, llm, safety, tools
 ROSTER: dict[str, dict] = {
     "attorney": {"name": "Ava", "role": "Attorney",
                  "focus": "leases, contracts, consumer rights, debt collection, wills and family-law basics, "
+                          "small-business basics (sole proprietorship vs LLC, registering, EIN), "
                           "free and low-cost legal help"},
     "accountant": {"name": "Marcus", "role": "Accountant",
-                   "focus": "taxes (federal brackets, credits, filing), budgets, debt payoff, emergency funds. "
-                            "When income is known, run estimate_federal_income_tax"},
+                   "focus": "taxes (federal brackets, credits, filing, self-employment tax for side businesses), "
+                            "budgets, debt payoff, emergency funds. When income is known, run "
+                            "estimate_federal_income_tax; for business or freelance profit, run "
+                            "estimate_self_employment_tax"},
     "investor": {"name": "Priya", "role": "Investor",
                  "focus": "saving and investing basics, retirement accounts, risk, fees, checking an adviser"},
     "housing": {"name": "Leo", "role": "Housing & Lifestyle Advisor",
-                "focus": "renting vs buying, mortgages, affordability, moving, cost of living"},
+                "focus": "renting vs buying, mortgages, affordability, planning a move (moving budget, "
+                         "notice to a landlord, change of address), cost of living"},
     "benefits": {"name": "Grace", "role": "Insurance & Benefits Navigator",
                  "focus": "health, life, disability, home and renters insurance; government benefits such as "
                           "SNAP, Medicaid, Social Security, unemployment"},
@@ -484,7 +488,8 @@ def _summarize(output: dict) -> str:
         return f"{len(output['documents'])} document(s) on file"
     if "content" in output:
         return f"read {output.get('name', 'document')}"
-    keys = [k for k, v in output.items() if isinstance(v, (int, float)) and not isinstance(v, bool)][:3]
+    keys = [k for k, v in output.items()
+            if isinstance(v, (int, float)) and not isinstance(v, bool) and k != "tax_year"][:3]
     return "; ".join(f"{k.replace('_', ' ')}: {output[k]:,}" for k in keys) or "done"
 
 

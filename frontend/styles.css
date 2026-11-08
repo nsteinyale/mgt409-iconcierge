@@ -262,3 +262,15 @@ a { color: var(--navy-2); }
 .rt-seat.bubble-below .rt-bubble { bottom: auto; top: calc(100% - 2px); transform: translate(-50%, -6px); }
 .rt-seat.bubble-below .rt-bubble.show { transform: translate(-50%, 0); }
 .rt-seat.bubble-below .rt-bubble::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--gold); }
+
+/* ---------- welcome topics ---------- */
+.welcome .welcome-q { font-size: 1.05rem; font-weight: 700; color: var(--navy); margin: .2rem 0 .5rem; }
+.topics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem; }
+.topic { display: flex; align-items: center; gap: .45rem; text-align: left; border: 1.5px solid var(--line); background: #fff;
+  border-radius: 12px; padding: .5rem .65rem; font-weight: 600; color: var(--navy); font-size: .88rem; }
+.topic:hover { border-color: var(--gold); }
+.topic.on { border-color: var(--gold); background: #fffaf0; box-shadow: 0 0 0 2px rgba(217, 164, 65, .25); }
+.topic-icon { font-size: 1.15rem; }
+.topic-prompts { display: flex; flex-direction: column; gap: .35rem; margin-top: .5rem; }
+.topic-prompt { text-align: left; border: 1.5px dashed var(--gold); background: #fffdf8; border-radius: 12px; padding: .45rem .7rem; font-size: .86rem; }
+.topic-prompt:hover { background: var(--gold-soft); }

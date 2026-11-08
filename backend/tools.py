@@ -9,6 +9,7 @@ import json
 import math
 import re
 import secrets
+from decimal import ROUND_HALF_UP, Decimal
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -34,7 +35,8 @@ class ToolContext:
 
 
 def _money(x: float) -> float:
-    return round(float(x), 2)
+    # Round half up on the decimal value (as a person would), not on the binary float.
+    return float(Decimal(str(float(x))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
 
 def _pct(x: float) -> float:
@@ -86,6 +88,34 @@ def estimate_federal_income_tax(ctx: ToolContext, gross_income: float, filing_st
         "brackets": rows,
         "not_included": "tax credits (child, EITC, etc.), state and local tax, Social Security and Medicare tax",
         "source_id": TAX_SOURCE,
+    }
+
+
+SS_WAGE_BASE_2026 = 184_500   # SSA, announced Oct 24, 2025
+
+
+def estimate_self_employment_tax(ctx: ToolContext, net_profit: float, w2_wages: float = 0) -> dict:
+    """2026 self-employment tax (Schedule SE): 15.3% on 92.35% of net profit; the 12.4% part stops at the wage base."""
+    profit = float(net_profit)
+    base = profit * 0.9235
+    if base < 400:
+        return {"self_employment_tax": 0.0, "note": "No self-employment tax when net earnings are under $400.",
+                "source_id": "irs-se-tax"}
+    ss_room = max(0.0, SS_WAGE_BASE_2026 - float(w2_wages))
+    social_security = 0.124 * min(base, ss_room)
+    medicare = 0.029 * base
+    total = social_security + medicare
+    return {
+        "tax_year": TAX_YEAR,
+        "net_profit": _money(profit),
+        "earnings_subject_to_tax": _money(base),
+        "social_security_part": _money(social_security),
+        "medicare_part": _money(medicare),
+        "self_employment_tax": _money(total),
+        "deduction_for_half": _money(total / 2),
+        "set_aside_per_month": _money(total / 12),
+        "not_included": "income tax on the profit, state tax, and the 0.9% additional Medicare tax over $200,000",
+        "source_id": "irs-se-tax",
     }
 
 
@@ -311,6 +341,12 @@ SCHEMAS: dict[str, dict] = {
         },
         "required": ["gross_income", "filing_status"],
     },
+    "estimate_self_employment_tax": {
+        "description": "2026 self-employment tax for a side business or freelancer (Schedule SE).",
+        "properties": {"net_profit": _num("Yearly business profit after expenses"),
+                       "w2_wages": _num("Wages from a regular job this year, if any")},
+        "required": ["net_profit"],
+    },
     "mortgage_payment": {
         "description": "Monthly cost of a home loan: principal, interest, property tax, insurance, PMI, HOA.",
         "properties": {
@@ -404,6 +440,7 @@ SCHEMAS: dict[str, dict] = {
 
 FUNCTIONS: dict[str, Callable[..., dict]] = {
     "estimate_federal_income_tax": estimate_federal_income_tax,
+    "estimate_self_employment_tax": estimate_self_employment_tax,
     "mortgage_payment": mortgage_payment,
     "home_affordability": home_affordability,
     "rent_vs_buy": rent_vs_buy,
@@ -421,7 +458,7 @@ FUNCTIONS: dict[str, Callable[..., dict]] = {
 COMMON = ["search_official_sources", "get_family_profile", "list_family_documents", "read_family_document"]
 TOOLSETS: dict[str, list[str]] = {
     "attorney": COMMON,
-    "accountant": COMMON + ["estimate_federal_income_tax", "budget_split", "loan_payoff",
+    "accountant": COMMON + ["estimate_federal_income_tax", "estimate_self_employment_tax", "budget_split", "loan_payoff",
                             "emergency_fund", "savings_growth", "mortgage_payment"],
     "investor": COMMON + ["savings_growth", "emergency_fund", "loan_payoff"],
     "housing": COMMON + ["mortgage_payment", "home_affordability", "rent_vs_buy", "budget_split"],

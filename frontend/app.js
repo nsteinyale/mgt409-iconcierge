@@ -301,16 +301,29 @@ async function loadChat() {
   const chat = $("#chat");
   const { messages } = await api("/api/messages").catch(() => ({ messages: [] }));
   chat.innerHTML = "";
-  if (!messages.length) {
-    chat.insertAdjacentHTML("beforeend", captainBubble(`<p>${esc(t("hello", { name: personName("captain") }))}</p>
-      <div class="samples"><strong>${esc(t("try_asking"))}</strong>${[1, 2, 3, 4].map(i =>
-      `<button data-sample="${i}">${esc(t("sample" + i))}</button>`).join("")}</div>`));
-    $$("[data-sample]", chat).forEach(b => b.onclick = () => { $("#ask").value = b.textContent; send(); });
-  }
   for (const m of messages) {
     if (m.role === "family") chat.insertAdjacentHTML("beforeend", familyBubble(m.content));
     else chat.insertAdjacentHTML("beforeend", captainBubble(renderMarkdown(m.content)));
   }
+  // Every visit opens with the Captain asking what the family wants help with.
+  const greeting = messages.length ? "" : `<p>${esc(t("hello", { name: personName("captain") }))}</p>`;
+  chat.insertAdjacentHTML("beforeend", captainBubble(`${greeting}<div class="samples welcome">
+    <p class="welcome-q">${esc(t("welcome_q"))}</p>
+    <div class="topics">${TOPICS.map(tp => `<button type="button" class="topic" data-topic="${tp.id}">
+      <span class="topic-icon" aria-hidden="true">${tp.icon}</span>${esc(t("t_" + tp.id))}</button>`).join("")}</div>
+    <div class="topic-prompts" aria-live="polite"></div>
+    <p class="stats">${esc(t("welcome_hint"))}</p></div>`));
+  $$("[data-topic]", chat).forEach(b => b.onclick = () => {
+    $$("[data-topic]", chat).forEach(x => x.classList.toggle("on", x === b));
+    const box = $(".topic-prompts", chat);
+    box.innerHTML = [1, 2].map(i => `<button type="button" class="topic-prompt">${esc(t(`p_${b.dataset.topic}_${i}`))}</button>`).join("");
+    $$(".topic-prompt", box).forEach(p => p.onclick = () => {
+      const ask = $("#ask");
+      ask.value = p.textContent;               // the family can edit the numbers before sending
+      ask.dispatchEvent(new Event("input"));
+      ask.focus();
+    });
+  });
   chat.scrollTop = chat.scrollHeight;
 }
 
@@ -331,7 +344,8 @@ async function send() {
   $("#send").disabled = true;
   box.value = ""; box.style.height = "auto";
   const chat = $("#chat");
-  $$(".samples", chat).forEach(el => el.remove());
+  // Remove the welcome topics; drop the Captain bubble too if nothing else was in it.
+  $$(".samples", chat).forEach(el => { const msg = el.closest(".msg"); el.remove(); if (msg && !$(".bubble", msg).textContent.trim()) msg.remove(); });
   chat.insertAdjacentHTML("beforeend", familyBubble(question));
   const pending = document.createElement("div");
   pending.className = "msg captain";
