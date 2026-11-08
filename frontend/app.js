@@ -255,9 +255,16 @@ async function showApp() {
       <button class="btn ghost small" id="signout">${esc(t("signout"))}</button>
     </header>
     <div class="main">
-      <section class="panel">
-        <div class="chat-head">${avatarHTML("captain", "lg", "captain-face")}
-          <div><h2>${esc(personName("captain"))}</h2><small>${esc(t("role_captain"))} · ${esc(t("style_" + me.settings.captain_style))}</small></div></div>
+      <section class="panel stage" aria-label="${esc(t("tab_office"))}">
+        <div class="stage-head"><h2>${esc(t("tab_office"))}</h2>
+          <div class="rt-tools"><div class="legend">${["assign", "tool", "memo", "note", "handoff"].map(k =>
+            `<span><i style="background:${PING_COLORS[k]}"></i>${esc(t("lg_" + k))}</span>`).join("")}</div>
+          <button id="replay" disabled>${esc(t("replay"))}</button></div></div>
+        <div id="rt" class="stage-table"></div>
+      </section>
+      <section class="panel chat-window">
+        <div class="chat-head">${avatarHTML("captain", "", "captain-face")}
+          <div><h2>${esc(personName("captain"))} <span class="online" aria-hidden="true"></span></h2><small>${esc(t("role_captain"))} · ${esc(t("style_" + me.settings.captain_style))}</small></div></div>
         <div class="chat-log" id="chat"></div>
         <div class="composer">
           <div class="attached" id="attached"></div>
@@ -269,9 +276,9 @@ async function showApp() {
           <div class="disclaimer">${esc(t("disclaimer"))}</div>
         </div>
       </section>
-      <section class="panel">
+      <section class="panel side-panel">
         <nav class="side-tabs">${["office", "todos", "docs", "drafts", "safety", "profile"].map(k =>
-          `<button data-tab="${k}" class="${state.tab === k ? "on" : ""}">${esc(t("tab_" + k))}</button>`).join("")}</nav>
+          `<button data-tab="${k}" class="${state.tab === k ? "on" : ""}">${esc(t(k === "office" ? "tab_activity" : "tab_" + k))}</button>`).join("")}</nav>
         <div class="side-body" id="side"></div>
       </section>
     </div>
@@ -291,8 +298,17 @@ async function showApp() {
   SPECIALISTS.concat("captain").forEach(id => state.desk[id] = state.desk[id] || "idle");
   await Promise.all([loadChat(), loadTodos(), loadDocs(), loadDrafts()]);
   // Keep the last run's events so the round table can replay it after a reload.
-  const lastRun = (await api("/api/messages").catch(() => ({ messages: [] }))).messages.filter(m => m.run_id).pop();
-  if (lastRun) state.lastEvents = (await api(`/api/runs/${lastRun.run_id}`).catch(() => ({ events: [] }))).events;
+  const runIds = [...new Set((await api("/api/messages").catch(() => ({ messages: [] }))).messages
+    .filter(m => m.run_id).map(m => m.run_id))].reverse().slice(0, 4);
+  for (const id of runIds) {      // the newest run that finished (an interrupted run has no events)
+    const events = (await api(`/api/runs/${id}`).catch(() => ({ events: [] }))).events;
+    if (events.some(e => e.type === "done")) { state.lastEvents = events; break; }
+  }
+  RoundTable.render($("#rt"), ["captain", ...SPECIALISTS], {
+    avatar: id => avatarHTML(id), name: id => esc(personName(id)), role: id => esc(t("role_" + id)), status: s => esc(t("status_" + s)) });
+  ["captain", ...SPECIALISTS].forEach(id => RoundTable.setStatus(id, state.desk[id] || "idle", t("status_" + (state.desk[id] || "idle"))));
+  $("#replay").onclick = replay;
+  $("#replay").disabled = !(state.lastEvents || []).length;
   renderSide();
   renderAttached();
 }
@@ -418,6 +434,7 @@ async function send() {
   chat.scrollTop = chat.scrollHeight;
   state.busy = false;
   $("#send").disabled = false;
+  if ($("#replay")) $("#replay").disabled = !(state.lastEvents || []).length;
   setDesk("captain", "idle");
 }
 
@@ -491,7 +508,7 @@ async function replay() {
   if (!events.length || state.busy) return;
   let prev = 0;
   for (const ev of events) {
-    if (!RoundTable.ready || state.tab !== "office") return;
+    if (!RoundTable.ready) return;
     const gap = Math.min(1200, Math.max(0, (ev.t - prev) * 1000 / 2));
     prev = ev.t;
     if (gap) await new Promise(r => setTimeout(r, gap));
@@ -594,16 +611,8 @@ function renderSide() {
   const side = $("#side");
   if (!side) return;
   if (state.tab === "office") {
-    const legend = ["assign", "tool", "memo", "note", "handoff"].map(k => `<span><i style="background:${PING_COLORS[k]}"></i>${esc(t("lg_" + k))}</span>`).join("");
     const feed = (state.feed || []).map(feedItemHTML).join("") || `<div class="feed-empty">${esc(t("office_empty"))}</div>`;
-    side.innerHTML = `<div class="rt-wrap"><div id="rt"></div>
-      <div class="rt-tools"><div class="legend">${legend}</div>
-      <button id="replay" ${(state.lastEvents || []).length ? "" : "disabled"}>${esc(t("replay"))}</button></div></div>
-      <div class="feed" id="feed">${feed}</div>`;
-    RoundTable.render($("#rt"), ["captain", ...SPECIALISTS], {
-      avatar: id => avatarHTML(id), name: id => esc(personName(id)), role: id => esc(t("role_" + id)), status: s => esc(t("status_" + s)) });
-    ["captain", ...SPECIALISTS].forEach(id => RoundTable.setStatus(id, state.desk[id] || "idle", t("status_" + (state.desk[id] || "idle"))));
-    $("#replay").onclick = replay;
+    side.innerHTML = `<div class="feed" id="feed">${feed}</div>`;
   } else if (state.tab === "todos") {
     side.innerHTML = `<form class="add-row" id="todo-form"><input id="todo-new" maxlength="200" placeholder="${esc(t("add_todo_ph"))}">
       <button class="btn small">${esc(t("add"))}</button></form>

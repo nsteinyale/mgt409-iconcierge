@@ -8,7 +8,7 @@ import json
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -364,9 +364,22 @@ def health():
 app.mount("/static", StaticFiles(directory=config.FRONTEND), name="static")
 
 
+@app.middleware("http")
+async def revalidate_static(request: Request, call_next):
+    # Always re-check app files so an updated script is never served from an old browser cache.
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 @app.get("/")
 def index():
-    return FileResponse(config.FRONTEND / "index.html")
+    # Stamp script and style links with the newest file time, so browsers never mix old and new files.
+    version = int(max(f.stat().st_mtime for f in config.FRONTEND.iterdir() if f.is_file()))
+    html = (config.FRONTEND / "index.html").read_text(encoding="utf-8")
+    html = html.replace('.js"', f'.js?v={version}"').replace('.css"', f'.css?v={version}"')
+    return HTMLResponse(html, headers={"Cache-Control": "no-cache"})
 
 
 @app.exception_handler(HTTPException)

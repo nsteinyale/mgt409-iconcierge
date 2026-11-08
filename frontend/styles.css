@@ -274,3 +274,29 @@ a { color: var(--navy-2); }
 .topic-prompts { display: flex; flex-direction: column; gap: .35rem; margin-top: .5rem; }
 .topic-prompt { text-align: left; border: 1.5px dashed var(--gold); background: #fffdf8; border-radius: 12px; padding: .45rem .7rem; font-size: .86rem; }
 .topic-prompt:hover { background: var(--gold-soft); }
+
+/* ---------- layout: round table on top, chat window + tabs below ---------- */
+.main { grid-template-columns: minmax(0, 1.05fr) minmax(340px, 1fr); grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "stage stage" "chat side"; }
+.stage { grid-area: stage; padding: .5rem .9rem .4rem;
+  background: radial-gradient(ellipse at 50% 120%, #f3e6cc 0%, #fffdf8 55%, #fff 100%); }
+.stage-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.stage-head h2 { margin: 0; font-size: 1rem; color: var(--navy); }
+.stage-head .rt-tools { padding: 0; gap: .8rem; }
+.stage-table { max-width: 780px; width: 100%; margin: 0 auto; }
+.stage .rt-scene { height: clamp(250px, 34vh, 340px); }
+.chat-window { grid-area: chat; min-height: 0; }
+.side-panel { grid-area: side; min-height: 0; }
+.chat-window .chat-head { padding: .55rem .9rem; gap: .6rem; }
+.chat-window .chat-head .avatar { width: 44px; height: 44px; }
+.chat-window .chat-head h2 { font-size: 1rem; display: flex; align-items: center; gap: .35rem; }
+.online { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); display: inline-block; box-shadow: 0 0 0 2px #e1f2e7; }
+.chat-window .chat-log { padding: .8rem; gap: .7rem; background: #fcfaf6; }
+.chat-window .bubble { font-size: .9rem; padding: .6rem .8rem; }
+.chat-window .msg { max-width: 96%; }
+.chat-window .composer { padding: .55rem .7rem; gap: .35rem; }
+.chat-window .disclaimer { font-size: .66rem; }
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; grid-template-areas: "stage" "chat" "side"; }
+  .chat-window .chat-log { max-height: 55vh; }
+}
