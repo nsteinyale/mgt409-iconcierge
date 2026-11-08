@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from . import auth, config, db, llm, safety, team
 
-app = FastAPI(title="iConcierge")
+app = FastAPI(title="iConcierge: Your Personal Family Office")
 db.init()
 
 SETTINGS_KEYS = {"language", "help_mode", "captain_name", "captain_style", "captain_avatar"}

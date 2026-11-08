@@ -1,4 +1,6 @@
-# iConcierge: your family's team of advisors
+# iConcierge: Your Personal Family Office
+
+Your family's team of AI advisors, one conversation away.
 
 Sign in, talk to your **Captain**, and watch a team of AI specialists work on your question live:
 

@@ -372,3 +372,10 @@ body:has(.page-video) { background: #14213d; }
 @keyframes coin { 0% { transform: scale(1.35); background: var(--gold-soft); } 100% { transform: scale(1); } }
 @keyframes coinup { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -22px); } }
 @media (max-width: 1100px) { .spend { transform: scale(.85); transform-origin: top right; } }
+
+/* ---------- product name: iConcierge, Your Personal Family Office ---------- */
+.auth-hero .brand-sub { margin-top: -.6rem; font-size: .95rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold); opacity: .95; }
+.topbar .brand { display: block; white-space: nowrap; }
+.topbar .brand-sub { margin-left: .6rem; font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #c9d1e6; }
+@media (max-width: 860px) { .topbar .brand-sub { display: none; } }
