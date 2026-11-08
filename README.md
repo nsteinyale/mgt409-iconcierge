@@ -17,6 +17,9 @@ Sign in, talk to your **Captain**, and watch a team of AI specialists work on yo
 into options with numbers, trade-offs, sources and suggested to-dos. If the family wants something written, the
 advisors hand their findings to **Ari**, who saves email drafts.
 
+Every team member has a fictional, AI-generated portrait with an "AI" badge (sources in
+`frontend/portraits/CREDITS.md`); drop a new photo named after an avatar id into `frontend/portraits/` to change one.
+
 **The office** is a 3D round table: the team sits facing each other and every real event travels across the table
 as a colored ping (assign = gold, calculator = blue, findings = green, huddle note = orange, hand-off to Ari =
 purple) with speech bubbles. Teammates not on the question are dimmed, and **Replay** re-runs the last question's

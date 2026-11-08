@@ -310,3 +310,17 @@ a { color: var(--navy-2); }
 .avatar.lg .ai-badge, .rt-person .ai-badge { font-size: .58rem; }
 .avatar.is-talking .avatar-photo { animation: speak .45s ease-in-out infinite alternate; }
 @keyframes speak { from { box-shadow: 0 0 0 2px var(--gold); } to { box-shadow: 0 0 0 6px rgba(217, 164, 65, .35); transform: scale(1.03); } }
+
+/* ---------- sign-in hero video ---------- */
+.auth-hero { position: relative; overflow: hidden; isolation: isolate; }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+.auth-hero::before { content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(160deg, rgba(20, 33, 61, .92) 0%, rgba(20, 33, 61, .72) 45%, rgba(34, 51, 92, .55) 100%); }
+.auth-hero .team-row .avatar { width: 58px; height: 58px; }
+@media (prefers-reduced-motion: reduce) { .hero-video { display: none; } .auth-hero { background: url(/static/media/office_orbit_poster.jpg) center / cover; } }
+.look-grid .look .avatar { width: 72px; height: 72px; }
+.auth-hero .team-row { flex-wrap: nowrap; gap: 0; }
+.auth-hero .team-row .avatar { width: 54px; height: 54px; margin-left: -12px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(20, 33, 61, .9); }
+.auth-hero .team-row .avatar:first-child { margin-left: 0; }
+.auth-hero .team-row .ai-badge { display: none; }
+.look-grid { display: grid; grid-template-columns: repeat(4, max-content); gap: .7rem; }

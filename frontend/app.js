@@ -120,6 +120,8 @@ function showAuth(mode) {
   root.innerHTML = `
   <div class="auth-wrap"><div class="auth-card">
     <div class="auth-hero">
+      <video class="hero-video" src="/static/media/office_orbit.mp4" poster="/static/media/office_orbit_poster.jpg"
+        autoplay muted loop playsinline aria-hidden="true"></video>
       <div class="brand">i<span>Concierge</span></div>
       <p>${esc(t("tagline"))}</p>
       <div class="team-row">${team}</div>
@@ -209,7 +211,7 @@ function showWizard(draft, step) {
       <strong>${esc(t("help_" + m))}</strong><span>${esc(t("help_" + m + "_d"))}</span></button>`).join("")}</div>
       <div class="field"><label>${esc(t("language"))}</label>${langSelect("lang-select wiz-lang")}</div>`;
   } else if (step === 2) {
-    body = `<div class="field"><label>${esc(t("captain_look"))}</label><div class="look-grid">${CAPTAIN_AVATARS.map(a =>
+    body = `<div class="field"><label>${esc(t("captain_look"))}</label><div class="look-grid">${captainChoices().map(a =>
       `<button type="button" class="look ${s.captain_avatar === a ? "on" : ""}" data-look="${a}"><div class="avatar">${avatarSVG(a)}</div></button>`).join("")}</div></div>
       <div class="field"><label for="cname">${esc(t("captain_name"))}</label><input id="cname" maxlength="30" placeholder="${esc(t("captain_name_ph"))}" value="${esc(s.captain_name)}"></div>
       <div class="field"><label>${esc(t("captain_style"))}</label><div class="choice-grid">${STYLES.map(st =>
@@ -718,7 +720,7 @@ function renderSide() {
     const s = state.me.settings;
     side.innerHTML = `<div id="profile-scope">${profileFields(state.me.profile)}</div>
       <h4>${esc(t("step_captain"))}</h4>
-      <div class="look-grid">${CAPTAIN_AVATARS.map(a => `<button type="button" class="look ${s.captain_avatar === a ? "on" : ""}" data-look="${a}"><div class="avatar">${avatarSVG(a)}</div></button>`).join("")}</div>
+      <div class="look-grid">${captainChoices().map(a => `<button type="button" class="look ${s.captain_avatar === a ? "on" : ""}" data-look="${a}"><div class="avatar">${avatarSVG(a)}</div></button>`).join("")}</div>
       <div class="row"><div class="field"><label>${esc(t("captain_name"))}</label><input id="cname" maxlength="30" value="${esc(s.captain_name)}"></div>
       <div class="field"><label>${esc(t("captain_style"))}</label><select id="cstyle">${STYLES.map(st => `<option value="${st}" ${s.captain_style === st ? "selected" : ""}>${esc(t("style_" + st))}</option>`).join("")}</select></div>
       <div class="field"><label>${esc(t("step_help"))}</label><select id="cmode">${MODES.map(m => `<option value="${m}" ${s.help_mode === m ? "selected" : ""}>${esc(t("help_" + m))}</option>`).join("")}</select></div></div>

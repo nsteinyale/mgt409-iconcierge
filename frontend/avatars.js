@@ -79,7 +79,7 @@ let PORTRAITS = {};
 function avatarSVG(id) {
   const photo = PORTRAITS[id];
   if (photo) {
-    return `<img class="avatar-photo" src="/static/portraits/${encodeURIComponent(photo)}" alt="" loading="lazy" draggable="false">
+    return `<img class="avatar-photo" src="/static/portraits/${encodeURIComponent(photo)}" alt="" draggable="false">
       <span class="ai-badge" title="AI team member">AI</span>`;
   }
   const p = PEOPLE[id] || PEOPLE.captain_a;
@@ -108,3 +108,8 @@ function avatarSVG(id) {
 }
 
 const CAPTAIN_AVATARS = ["captain_a", "captain_b", "captain_c", "captain_d"];
+const EXTRA_CAPTAINS = ["captain_e", "captain_f", "captain_g", "captain_h"];   // offered only when a photo exists
+
+function captainChoices() {
+  return CAPTAIN_AVATARS.concat(EXTRA_CAPTAINS.filter(id => PORTRAITS[id]));
+}
