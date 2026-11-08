@@ -53,8 +53,10 @@ Then start it:
 python run.py
 ```
 
-Your browser opens http://127.0.0.1:8765. Click **Create a family account**, finish the 3 setup steps, and try a
-sample question. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
+Your browser opens http://127.0.0.1:8765. Click **Create a family account**, finish the 3 setup steps, then pick
+a topic under **"What do you want help with?"** (starting a company, planning a move, investing, taxes, buying a
+home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 8, 2026
+took 4 min 13 s to install and answered its first question 17 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
 
 The app uses `gpt-6-luna` through the course Portkey key. With a personal `OPENAI_API_KEY` instead, set
 `OPENAI_MODEL` too.
@@ -74,7 +76,7 @@ steps in, it shows live in **The office**, in a footer under each answer and in 
 | **2. Document guard** (at upload) | Hidden text in PDFs (the Froggy attack: white, tiny, transparent or off-page text) | Only text a person can see is kept (PyMuPDF reads each span's color and size); the hidden text is shown to the family, never to the AI |
 | | Zero-width characters that hide instructions from filters | Stripped |
 | | Visible instructions planted in a document ("wire $2,000 to…") | Line flagged and labeled as untrusted; document text is wrapped in random one-time markers so it can't fake its own end |
-| **3. Output guard** (before anything is shown) | Links that could leak family data | Only the 34 vetted official sources can appear; any other link is removed |
+| **3. Output guard** (before anything is shown) | Links that could leak family data | Only the 42 vetted official sources can appear; any other link is removed |
 | | Flagged document content echoed back | Sentences repeating amounts, account numbers, emails or links from flagged lines are dropped |
 | | Private numbers in answers | Redacted again |
 | **4. Audit** | Made-up numbers (the model "reward hacking" with plausible figures) | Every number in the answer is traced to a calculator result or the family's own figures; untraced ones are flagged for review |
@@ -136,6 +138,8 @@ backend/
 frontend/      plain HTML/CSS/JS: sign-in, setup wizard, chat, live office, to-dos, documents, profile
 tests/         unit and attack tests (test_*.py) and the live red-team script (redteam.py)
 output/        red-team report and a booby-trapped demo lease
+docs/          report and slide sources (python docs/build.py rebuilds report.html and slides.html),
+               screenshots, SUBMISSION_CHECKLIST.md, demo_video_script.md, real_user_test_kit.md
 ```
 
 General information, not legal, tax or investment advice.

@@ -62,13 +62,14 @@
   <div><b>Author:</b> Nate Stein · MGT 409 AI Foundations for Managers · Yale SOM · Fall 2026 · Final project (solo)</div>
   <div><b>Code:</b> <a href="https://github.com/nsteinyale/mgt409-iconcierge">github.com/nsteinyale/mgt409-iconcierge</a> (private; access shared with the teaching staff)</div>
   <div><b>Run it:</b> <code>pip install -r requirements.txt</code>, put <code>PORTKEY_API_KEY</code> in <code>.env</code> (repo folder or one above), then <code>python run.py</code> → http://127.0.0.1:8765. Full steps in the README.</div>
-  <div><b>Model:</b> <code>gpt-6-luna</code> through the course Portkey key · <b>Slides:</b> <code>slides.html</code> · <b>Measured on:</b> November 7, 2026</div>
+  <div><b>Model:</b> <code>gpt-6-luna</code> through the course Portkey key · <b>Slides:</b> <code>slides.html</code> · <b>Measured on:</b> November 7–8, 2026</div>
+  <div><b>Dry run (Nov 8):</b> fresh clone into a new folder, <code>.env</code> one folder up, README steps only → installed in 4 min 13 s, first answer 17 s later, all tests passing.</div>
 </div>
 
 <div class="kpis">
   <div class="kpi"><b>7</b><span>agents (Captain, 5 advisors, Ari)</span></div>
-  <div class="kpi"><b>$0.0018</b><span>average cost per question (8 measured runs)</span></div>
-  <div class="kpi"><b>21 s</b><span>average time to a full answer</span></div>
+  <div class="kpi"><b>$0.0018</b><span>average cost per question (9 measured runs)</span></div>
+  <div class="kpi"><b>22 s</b><span>average time to a full answer</span></div>
   <div class="kpi"><b>9 / 9</b><span>live red-team attacks stopped</span></div>
 </div>
 
@@ -89,13 +90,16 @@
   <tr><th>Usual approach</th><th>What iConcierge does differently</th></tr>
   <tr><td>One chatbot answers everything in one voice.</td><td><b>A visible team around a table.</b> A Captain plans and assigns; up to three specialists work in parallel with their own tools; they then leave each other notes ("huddle") before the Captain writes one answer. The family watches it in <b>The office</b>: a 3D round table where every real event (an assignment, a calculator call, a finding, a note between teammates) travels across the table as a colored ping, with speech bubbles and a Replay button. A glass box rather than a black box.</td></tr>
   <tr><td>Advice stops at the chat window.</td><td><b>Ari, My AI Assistant, writes the follow-up.</b> When the family needs to email a landlord, insurer or agency, Ari turns the team's findings into a draft. One click opens it in Gmail, Outlook or the family's email app, or copies a ready prompt for their own Claude or ChatGPT. <b>Nothing is ever sent by the app.</b> Direct Gmail/Outlook connections are designed (sign-in with Google or Microsoft, never a password) but wait for the professor's OK on an extra key.</td></tr>
-  <tr><td>The model does arithmetic and quotes numbers it remembers.</td><td><b>Every number comes from code.</b> Eight calculators (2026 federal tax from the IRS's published brackets, mortgage, affordability, rent vs. buy, budget, savings growth, emergency fund, debt payoff). An audit then traces every number in the answer back to a calculator or the family's own figures.</td></tr>
-  <tr><td>Links and citations can be invented.</td><td><b>Only vetted sources.</b> 34 official sources (IRS, CFPB, HUD, SSA, legal aid…), each link checked on Nov 7, 2026. Any other link is removed before display.</td></tr>
+  <tr><td>The model does arithmetic and quotes numbers it remembers.</td><td><b>Every number comes from code.</b> Nine calculators (2026 federal tax from the IRS's published brackets, 2026 self-employment tax, mortgage, affordability, rent vs. buy, budget, savings growth, emergency fund, debt payoff). An audit then traces every number in the answer back to a calculator or the family's own figures.</td></tr>
+  <tr><td>Links and citations can be invented.</td><td><b>Only vetted sources.</b> 42 official sources (IRS, SBA, CFPB, HUD, SSA, legal aid…), each link checked on Nov 7–8, 2026. Any other link is removed before display.</td></tr>
   <tr><td>Advice tends to give orders ("you should…").</td><td><b>Options, not orders.</b> The design rule, carried over from my Read Me First project, is that the family decides. "You should" wording is measured on every answer.</td></tr>
+  <tr><td>A blank chat box: "what do I even ask?"</td><td><b>The Captain opens every visit with "What do you want help with?"</b> and eight topic cards (starting a company, planning a move, learning about investing, tax compliance, buying a home, debt, insurance, legal letters), each with two example questions in all six languages. Picking one fills the box so the family can change the numbers before sending.</td></tr>
   <tr><td>Each conversation starts from zero.</td><td><b>A family account.</b> Passcode sign-in, a remembered profile (ranges, never SSNs), a shared to-do list the team fills in, and a document drawer.</td></tr>
   <tr><td>English only; a generic assistant persona.</td><td><b>Six languages</b> (English, Spanish, Chinese, Portuguese, French, Bengali) and a Captain the family designs: look, name and style.</td></tr>
   <tr><td>Reading uploaded files trusts whatever text is inside.</td><td><b>Lecture 12 defenses in code:</b> only text a person can see is read from PDFs; planted instructions are flagged; safety events are shown to the family.</td></tr>
 </table>
+<figure style="max-width:78%;margin-left:auto;margin-right:auto"><img src="{{IMG:09_welcome_topics.jpg}}" alt="Welcome topics"><figcaption>Every visit opens with the Captain asking "What do you want help with?": eight topics, each with two example questions; the round table waits on the right.</figcaption></figure>
+<p><b>Named alternatives and how families use them today.</b> General chatbots (ChatGPT, Claude, Gemini) answer in one voice, do their own arithmetic and can cite anything. Single-domain services each cover one slice: TurboTax and H&amp;R Block for taxes, LegalZoom for legal documents, Betterment and Wealthfront for investing, Zillow and NerdWallet calculators for housing and budgets. Directories such as 211, findhelp.org and New Haven Navigator point people to programs. A family with a cross-cutting question (a down payment that is also an emergency-fund, tax and insurance question) has to stitch these together alone. iConcierge's difference is the coordinated team, code-computed numbers, vetted sources and drafts that turn advice into action.</p>
 <p>It is deliberately not a "chat with your PDF" tool: documents are one input the specialists can choose to read, not the product. Compared with resource directories such as New Haven Navigator, iConcierge doesn't send people to a list; it works the problem with them and shows its math.</p>
 
 <!-- 4. The agents -->
@@ -187,7 +191,8 @@
   <tr><td>6</td><td>Lease deposit (booby-trapped PDF)</td><td class="num">1</td><td class="num">4</td><td class="num">5,794 (0)</td><td class="num">1,353</td><td class="num">$0.00126</td><td class="num">15.5 s</td></tr>
   <tr><td>7</td><td>Newlyweds: taxes, loans vs. saving, renters insurance</td><td class="num">2</td><td class="num">13</td><td class="num">22,160 (11,211)</td><td class="num">2,301</td><td class="num">$0.00236</td><td class="num">29.8 s</td></tr>
   <tr><td>8</td><td>Deposit withheld: options + Ari drafts an email to the landlord</td><td class="num">1 + Ari</td><td class="num">8</td><td class="num">14,046 (5,291)</td><td class="num">1,816</td><td class="num">$0.00184</td><td class="num">27.8 s</td></tr>
-  <tr><td colspan="3"><b>Average of 8</b></td><td class="num"><b>9</b></td><td class="num"><b>13,248 (39% cached)</b></td><td class="num"><b>1,875</b></td><td class="num"><b>$0.00179</b></td><td class="num"><b>21.1 s</b></td></tr>
+  <tr><td>9</td><td>Starting a side business: LLC or not, self-employment tax</td><td class="num">2</td><td class="num">12</td><td class="num">17,228 (6,189)</td><td class="num">1,940</td><td class="num">$0.00214</td><td class="num">25.0 s</td></tr>
+  <tr><td colspan="3"><b>Average of 9</b></td><td class="num"><b>9</b></td><td class="num"><b>13,690 (39% cached)</b></td><td class="num"><b>1,882</b></td><td class="num"><b>$0.00183</b></td><td class="num"><b>21.5 s</b></td></tr>
 </table>
 <h3>Where the tokens go</h3>
 <table>
@@ -197,25 +202,26 @@
   <tr><td>Huddle note</td><td class="num">720</td><td class="num">67</td><td class="num">2.1 s</td><td>Cheap: about $0.0001 each</td></tr>
   <tr><td>Captain summary</td><td class="num">1,093</td><td class="num">485</td><td class="num">4.5 s</td><td>Output-heavy, so the most expensive single call</td></tr>
 </table>
-<p>By agent, the Captain accounts for 36% of total spend (two calls per question, both output-heavy), the Accountant 20% (most often assigned) and the other specialists the rest. Ari adds two calls and about $0.0005 to a question when a draft is wanted.</p>
+<p>By agent, the Captain accounts for 36% of total spend (two calls per question, both output-heavy), the Accountant 22% (most often assigned), the Attorney 15%, Grace 13%, Leo 8%, Priya 4% and Ari 3%. Ari adds two calls and about $0.0005 to a question when a draft is wanted.</p>
 
 <h3>Per user and at scale</h3>
 <table>
   <tr><th>Scenario</th><th>Assumption</th><th class="num">Model cost</th></tr>
-  <tr><td>One question</td><td>Measured average</td><td class="num">$0.0018</td></tr>
-  <tr><td>One family, one month</td><td>10 questions</td><td class="num">$0.018</td></tr>
-  <tr><td>One family, one year</td><td>120 questions</td><td class="num">$0.21</td></tr>
-  <tr><td>A city program: 10,000 families</td><td>10 questions/month each</td><td class="num">$180 / month</td></tr>
-  <tr><td>A national nonprofit: 1,000,000 families</td><td>10 questions/month each</td><td class="num">$18,000 / month</td></tr>
+  <tr><td>One question (one run)</td><td>Measured average of 9 runs</td><td class="num">$0.00183</td></tr>
+  <tr><td>One user (family), one month</td><td>10 questions</td><td class="num">$0.018</td></tr>
+  <tr><td>One user, one year</td><td>120 questions</td><td class="num">$0.22</td></tr>
+  <tr><td><b>100 users</b> (a pilot with one nonprofit)</td><td>10 questions/month each</td><td class="num"><b>$1.83 / month</b></td></tr>
+  <tr><td><b>10,000 users</b> (a city program)</td><td>10 questions/month each</td><td class="num"><b>$183 / month</b></td></tr>
+  <tr><td>1,000,000 users (a national nonprofit)</td><td>10 questions/month each</td><td class="num">$18,300 / month</td></tr>
   <tr><td>Heaviest guardrail: rate limit</td><td>30 questions/hour per family at the most expensive run seen ($0.003)</td><td class="num">≤ $0.09 / hour</td></tr>
 </table>
-<p>For comparison, one hour with a lawyer at the U.S. average rate ($349) buys about 195,000 iConcierge questions at the measured average. Hosting, storage and a human review team would dominate real costs at scale. The model bill is not the constraint.</p>
+<p>For comparison, one hour with a lawyer at the U.S. average rate ($349) buys about 190,000 iConcierge questions at the measured average. Hosting, storage and a human review team would dominate real costs at scale. The model bill is not the constraint.</p>
 
 <h3>Cost-cutting steps and their measured effects</h3>
 <table>
   <tr><th>Step</th><th>Measured effect</th></tr>
   <tr><td><b>Turn reasoning off for tool calls and cap source searches at 2 per specialist</b> (same question, before vs. after)</td><td>AI calls 14 → 11; input tokens 37,821 → 15,911 (−58%); output 4,610 → 2,042 (−56%); <b>cost $0.00459 → $0.00189 (−59%)</b>; time 43.2 s → 23.8 s (−45%). Before the cap, one specialist ran 9 searches in a single question.</td></tr>
-  <tr><td><b>Prompt caching</b> (stable system prompts first, growing tool history after)</td><td>39% of all input tokens were served from cache at one-tenth the price, saving $0.0033 of $0.0158 (21%) across the 7 runs.</td></tr>
+  <tr><td><b>Prompt caching</b> (stable system prompts first, growing tool history after)</td><td>39% of all input tokens were served from cache at one-tenth the price, saving $0.0043 of $0.0208 (21%) across the 9 runs.</td></tr>
   <tr><td><b>Answer in code when no AI is needed</b></td><td>Crisis messages: 0 calls, $0. Requests the provider's filter blocks: 0 billed calls. Harmful requests: 1 call ($0.0001) and no specialists.</td></tr>
   <tr><td><b>Hard limits</b>: 3 specialists, 4 tool rounds, small output caps (huddle 200 tokens, plan 900)</td><td>Worst run seen: 14 calls, $0.0030. No runaway loops in any test.</td></tr>
   <tr><td><b>Only the specialists who are needed</b></td><td>Single-domain questions use 1 specialist and 4 calls ($0.0008–$0.0013), about half the cost of multi-domain ones.</td></tr>
@@ -229,7 +235,7 @@
   <tr><th>Risk</th><th>Defense built</th><th>Layer</th></tr>
   <tr><td>Hidden text in an uploaded PDF steers the advice (indirect prompt injection, the Froggy attack)</td><td>PyMuPDF reads each text span's color, size, transparency and position; only text a person can see is kept. Hidden passages are shown to the family and never sent to the AI.</td><td>Document</td></tr>
   <tr><td>Visible planted instructions ("ignore all instructions… wire $2,000")</td><td>Lines that read like instructions to an AI are flagged and labeled untrusted. Document text is wrapped in random one-time markers so it can't fake its own end. If a flagged line's amount, account number, email or link shows up in an answer, that sentence is removed.</td><td>Document + output</td></tr>
-  <tr><td>Data exfiltration via links</td><td>Only the 34 vetted sources (and their known redirects) may appear; any other URL is replaced with "[link removed]".</td><td>Output</td></tr>
+  <tr><td>Data exfiltration via links</td><td>Only the 42 vetted sources (and their known redirects) may appear; any other URL is replaced with "[link removed]".</td><td>Output</td></tr>
   <tr><td>Family types an SSN, card number or password</td><td>Redacted before storage and before any AI call (card numbers verified with the Luhn check, so ordinary dollar amounts and ZIP codes pass).</td><td>Input</td></tr>
   <tr><td>Someone in crisis</td><td>Answered from code in the family's language with 988, 911 and the domestic-violence hotline. Zero AI calls, zero delay.</td><td>Input</td></tr>
   <tr><td>Jailbreaks and system-prompt extraction</td><td>Override phrases are flagged and the Captain is told its rules never change. The provider's own content filter is a second, independent layer; when it fires, the app replies with a polite refusal instead of an error.</td><td>Input</td></tr>
@@ -266,14 +272,15 @@
 <h2 class="keep">7. Impact and metrics</h2>
 <table>
   <tr><th>Measure</th><th>Result</th><th>Source</th></tr>
-  <tr><td>Time to a complete, sourced answer from a team of up to 3 specialists</td><td class="num"><b>20 s average</b> (12.5–29.8 s)</td><td>Measured, 7 runs</td></tr>
-  <tr><td>Cost per answer</td><td class="num"><b>$0.0018 average</b></td><td>Measured, 7 runs</td></tr>
+  <tr><td>Time to a complete, sourced answer from a team of up to 3 specialists</td><td class="num"><b>22 s average</b> (12.5–29.8 s)</td><td>Measured, 9 runs</td></tr>
+  <tr><td>Cost per answer</td><td class="num"><b>$0.0018 average</b></td><td>Measured, 9 runs</td></tr>
   <tr><td>Cost of one hour with a lawyer</td><td class="num">$349</td><td><a href="https://www.clio.com/resources/legal-trends/compare-lawyer-rates/">Clio</a></td></tr>
   <tr><td>Adults without a financial advisor</td><td class="num">about 66%</td><td>Northwestern Mutual 2025 (via <a href="https://247wallst.com/personal-finance/2026/05/12/the-northwestern-mutual-2025-study-says-74-of-millionaires-work-with-a-financial-advisor-versus-just-34-of-everyone-else/">24/7 Wall St.</a>)</td></tr>
   <tr><td>Low-income civil legal problems with no or not enough help</td><td class="num">92%</td><td><a href="https://justicegap.lsc.gov/resource/executive-summary">LSC Justice Gap 2022</a></td></tr>
-  <tr><td>Tax calculator accuracy against the IRS's 2026 brackets</td><td>Exact on every test case (e.g. $45,000 single → $3,220; $120,000 joint → $10,040)</td><td>Unit tests; <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill">IRS Rev. Proc. 2025-32</a></td></tr>
+  <tr><td>Tax calculator accuracy against the IRS's 2026 brackets</td><td>Exact on every test case (e.g. $45,000 single → $3,220; $120,000 joint → $10,040; $50,000 self-employment profit → $7,064.78)</td><td>Unit tests; <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill">IRS Rev. Proc. 2025-32</a></td></tr>
+  <tr><td>Setup time for the teaching staff (fresh clone, README only)</td><td>4 min 13 s to install; first answer 17 s later</td><td>Dry run, Nov 8, 2026</td></tr>
   <tr><td>Attacks stopped / false alarms on a normal question</td><td>9 of 9 / none (after the fix above)</td><td>Live red team</td></tr>
-  <tr><td>Official source links that opened when checked</td><td>27 of 34 opened; the other 7 are official sites that block automated checks (CFPB, SSA, Medicaid, NAIC)</td><td>Link check, Nov 7, 2026</td></tr>
+  <tr><td>Official source links that opened when checked</td><td>34 of 42 opened; the other 8 are official sites that block automated checks (CFPB, SSA, Medicaid, NAIC)</td><td>Link checks, Nov 7–8, 2026</td></tr>
 </table>
 <p><b>What the team caught that a single answer might not.</b> In run 3 the huddle tied the down-payment question to the emergency fund ("$12,000 is four months… using it all would eliminate that cushion"), and Leo flagged that the saved profile conflicted with the message instead of silently picking one. In run 7 Grace and Marcus agreed that both spouses must be named insureds on the renters policy, a detail neither question asked about.</p>
 <p><b>Real-user evidence: not yet.</b> I haven't run a trial with outside families. The impact numbers above are measured on the system and sourced for the problem, but I can't yet claim time saved or decisions improved for real households. The planned trial is in Section 8.</p>
