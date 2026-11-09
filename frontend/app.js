@@ -21,7 +21,7 @@ function levelSelect(current, id) {
 }
 
 const state = {
-  me: null, roster: {}, todos: [], docs: [], drafts: [], attached: [], busy: false, tab: "office",
+  me: null, roster: {}, todos: [], docs: [], drafts: [], attached: [], busy: false, tab: "daily", daily: null, dailyShown: false,
   lastEvents: [], lastDrafts: [],
   desk: {}, // id -> idle | thinking | working | done
 };
@@ -315,7 +315,7 @@ async function showApp() {
         </div>
       </section>
       <section class="panel side-panel">
-        <nav class="side-tabs">${["office", "todos", "docs", "drafts", "safety", "profile"].map(k =>
+        <nav class="side-tabs">${["daily", "office", "todos", "docs", "drafts", "safety", "profile"].map(k =>
           `<button data-tab="${k}" class="${state.tab === k ? "on" : ""}">${esc(t(k === "office" ? "tab_activity" : "tab_" + k))}</button>`).join("")}</nav>
         <div class="side-body" id="side"></div>
       </section>
@@ -334,6 +334,7 @@ async function showApp() {
   $("#send").onclick = send;
   $("#level").onchange = async e => {
     state.me = await api("/api/me", { method: "PUT", body: { settings: { explain_level: e.target.value } } }).catch(() => state.me);
+    if (state.daily?.key !== dailyKey()) loadDaily();
   };
   $("#attach-btn").onclick = () => { state.tab = "docs"; $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "docs")); renderSide(); };
   SPECIALISTS.concat("captain").forEach(id => state.desk[id] = state.desk[id] || "idle");
@@ -352,6 +353,50 @@ async function showApp() {
   $("#replay").disabled = !(state.lastEvents || []).length;
   renderSide();
   renderAttached();
+  // A new language or explanation level gets its own Daily Update (the server caches each one for the day).
+  if (!state.daily || state.daily.error || state.daily.key !== dailyKey()) loadDaily();
+}
+
+// ---------- Daily Update: one idea from each team member, made once a day ----------
+function dailyKey() { return LANG + "/" + (state.me?.settings.explain_level || "beginner"); }
+
+async function loadDaily() {
+  const key = dailyKey();
+  state.daily = { loading: true, key };
+  if (state.tab === "daily") renderSide();
+  try {
+    state.daily = { ...(await api("/api/daily")), key };
+  } catch (e) {
+    state.daily = { error: true, key };
+  }
+  if (state.tab === "daily") renderSide();
+  if (state.daily.tips && !state.dailyShown && !state.busy) announceDaily();
+}
+
+function announceDaily() {          // each seat says its headline once, one after another
+  if (!RoundTable.ready) return;
+  state.dailyShown = true;
+  state.daily.tips.forEach((tip, i) => setTimeout(() => {
+    if (state.busy) return;
+    talk(tip.member, 1800);
+    RoundTable.bubble(tip.member, "💡 " + String(tip.title || "").trim(), 3600);
+  }, 700 + i * 1100));
+}
+
+function dailyHTML() {
+  const d = state.daily;
+  if (!d || d.loading) return `<div class="feed-empty daily-loading">${avatarHTML("captain", "sm", "is-thinking")}<span>${esc(t("daily_loading"))}</span></div>`;
+  if (d.error || !(d.tips || []).length) return `<div class="feed-empty">${esc(t("daily_error"))}<br><button class="btn small ghost" id="daily-retry">${esc(t("daily_retry"))}</button></div>`;
+  const day = new Date(d.day + "T12:00:00").toLocaleDateString(LANG, { weekday: "long", month: "long", day: "numeric" });
+  return `<div class="daily-head"><h3>☀️ ${esc(t("daily_title"))}</h3><small>${esc(day)}</small><p>${esc(t("daily_intro"))}</p></div>
+    ${d.tips.map((tip, i) => `<article class="daily-tip">
+      ${avatarHTML(tip.member, "sm")}
+      <div class="grow"><div class="who">${esc(personName(tip.member))} <small>· ${esc(t("role_" + tip.member))}</small></div>
+        <h4>${esc(tip.title)}</h4><p>${esc(tip.tip)}</p>
+        <div class="daily-foot">${tip.source ? `<a href="${esc(tip.source.url)}" target="_blank" rel="noopener noreferrer">${esc(t("daily_source"))}: ${esc(tip.source.title)}</a>` : ""}
+          <button class="btn small ghost" data-daily-ask="${i}">💬 ${esc(t("daily_ask"))}</button></div></div>
+    </article>`).join("")}
+    <div class="daily-cost">${esc(t("daily_cost", { cost: fmtUsd(d.cost) }))}</div>`;
 }
 
 async function loadChat() {
@@ -723,7 +768,17 @@ function onEvent(ev) {
 function renderSide() {
   const side = $("#side");
   if (!side) return;
-  if (state.tab === "office") {
+  if (state.tab === "daily") {
+    side.innerHTML = `<div class="daily">${dailyHTML()}</div>`;
+    $("#daily-retry")?.addEventListener("click", loadDaily);
+    $$("[data-daily-ask]").forEach(b => b.onclick = () => {
+      const tip = state.daily.tips[Number(b.dataset.dailyAsk)];
+      const ask = $("#ask");
+      ask.value = t("daily_ask_q", { name: personName(tip.member), title: tip.title });   // the family can edit before sending
+      ask.dispatchEvent(new Event("input"));
+      ask.focus();
+    });
+  } else if (state.tab === "office") {
     const feed = (state.feed || []).map(feedItemHTML).join("") || `<div class="feed-empty">${esc(t("office_empty"))}</div>`;
     side.innerHTML = `<div class="feed" id="feed">${feed}</div>`;
   } else if (state.tab === "todos") {

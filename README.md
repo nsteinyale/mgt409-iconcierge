@@ -66,6 +66,11 @@ took 4 min 13 s to install and answered its first question 17 s later. (Set `ICO
 Use the **🎓 Explanations** menu in the chat header to pick how answers are written: *Explain like I'm 5*, Beginner
 (default), Intermediate, Advanced or Professional. It is also in setup and the Profile tab.
 
+The **☀️ Daily Update** tab opens first: one idea of the day from each member of the round table (the Captain,
+Ava, Marcus, Priya, Leo, Grace and Ari), each tied to a vetted source and fitted to the family's profile, with an
+"Ask about this" button. One AI call writes all seven (about $0.0004), and it is cached per family, day, language
+and explanation level, so a family pays for it at most once a day. Tips pass the same output guard as answers.
+
 The app uses `gpt-6-luna` through the course Portkey key. With a personal `OPENAI_API_KEY` instead, set
 `OPENAI_MODEL` too.
 

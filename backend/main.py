@@ -12,7 +12,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, config, db, llm, safety, team
+from . import auth, config, daily, db, llm, safety, team
 
 app = FastAPI(title="iConcierge: Your Personal Family Office")
 db.init()
@@ -176,6 +176,19 @@ async def ask(body: Ask, family: dict = Depends(current_family)):
 
     return StreamingResponse(stream(), media_type="application/x-ndjson",
                              headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
+
+
+@app.get("/api/daily")
+async def daily_tips(family: dict = Depends(current_family)):
+    """One tip from each team member, made once a day (cached per language and explanation level)."""
+    try:
+        config.api_settings()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    try:
+        return await daily.daily_update(family)
+    except llm.ContentFiltered:
+        raise HTTPException(status_code=502, detail="generic")
 
 
 @app.get("/api/messages")

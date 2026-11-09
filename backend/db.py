@@ -63,6 +63,14 @@ CREATE TABLE IF NOT EXISTS documents (
     text TEXT NOT NULL,
     created_at REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS daily_updates (
+    family_id INTEGER NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+    day TEXT NOT NULL,
+    lang TEXT NOT NULL,
+    level TEXT NOT NULL,
+    data_json TEXT NOT NULL,
+    PRIMARY KEY (family_id, day, lang, level)
+);
 CREATE TABLE IF NOT EXISTS drafts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     family_id INTEGER NOT NULL REFERENCES families(id) ON DELETE CASCADE,
@@ -326,6 +334,21 @@ def delete_document(family_id: int, doc_id: int) -> bool:
     with connect() as conn:
         cur = conn.execute("DELETE FROM documents WHERE id = ? AND family_id = ?", (doc_id, family_id))
         return cur.rowcount > 0
+
+
+# --- daily update cache ----------------------------------------------------------------
+
+def get_daily(family_id: int, day: str, lang: str, level: str) -> dict | None:
+    with connect() as conn:
+        row = conn.execute("SELECT data_json FROM daily_updates WHERE family_id = ? AND day = ? AND lang = ? AND level = ?",
+                           (family_id, day, lang, level)).fetchone()
+    return json.loads(row["data_json"]) if row else None
+
+
+def save_daily(family_id: int, day: str, lang: str, level: str, data: dict) -> None:
+    with connect() as conn:
+        conn.execute("INSERT OR REPLACE INTO daily_updates VALUES (?, ?, ?, ?, ?)",
+                     (family_id, day, lang, level, json.dumps(data, ensure_ascii=False)))
 
 
 # --- drafts (never sent by the app) ----------------------------------------------------

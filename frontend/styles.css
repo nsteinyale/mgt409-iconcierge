@@ -386,3 +386,19 @@ body:has(.page-video) { background: #14213d; }
 .level-select { border: 1.5px solid var(--line); border-radius: 999px; padding: .25rem .55rem; font-size: .8rem; background: #fff;
   color: var(--navy); font-weight: 600; max-width: 190px; }
 .level-select:focus { outline: 2px solid var(--gold); }
+
+/* ---------- Daily Update ---------- */
+.daily { display: flex; flex-direction: column; gap: .6rem; }
+.daily-head h3 { margin: 0; color: var(--navy); font-size: 1.05rem; }
+.daily-head small { color: var(--muted); text-transform: capitalize; }
+.daily-head p { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }
+.daily-tip { display: flex; gap: .65rem; align-items: flex-start; padding: .7rem; border: 1px solid var(--line); border-radius: 12px; background: #fff; border-left: 4px solid var(--gold); }
+.daily-tip .avatar { flex: none; }
+.daily-tip .who { font-weight: 700; font-size: .88rem; }
+.daily-tip .who small { font-weight: 500; color: var(--muted); }
+.daily-tip h4 { margin: .15rem 0 .2rem; font-size: .95rem; color: var(--navy); }
+.daily-tip p { margin: 0; font-size: .88rem; line-height: 1.45; }
+.daily-foot { display: flex; flex-wrap: wrap; gap: .4rem .7rem; align-items: center; justify-content: space-between; margin-top: .45rem; }
+.daily-foot a { font-size: .78rem; color: var(--muted); }
+.daily-loading { display: flex; gap: .6rem; align-items: center; justify-content: center; }
+.daily-cost { text-align: center; font-size: .75rem; color: var(--muted); }
