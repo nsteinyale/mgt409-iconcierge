@@ -1,0 +1,31 @@
+1
+00:00:00,250 --> 00:00:13,199
+Most families make big money, housing and legal decisions without a lawyer, an accountant or a financial planner. iConcierge, your personal family office, gives every family a team.
+
+2
+00:00:13,902 --> 00:00:32,150
+Guest mode opens a private space, with no account. Each day, the team greets you with a Daily Update: one idea from each member, in their own voice, tied to an official source. All seven come from one cached AI call, about four hundredths of a cent.
+
+3
+00:00:33,185 --> 00:00:59,133
+Now a real question. We're moving out, and we want our security deposit back. Rosa, the Captain, picks the right specialists and assigns the work. Gold pings are assignments, blue is a calculator or a source lookup, green is findings coming back, and purple hands the work to Ari, my AI assistant. The meter on the right shows the spend, live.
+
+4
+00:00:59,535 --> 00:01:13,994
+The answer lays out options, not orders. It cites only vetted official sources, and it adds to-dos. Eight safety checks ran on it, from private numbers to tracing every figure back to a calculator.
+
+5
+00:01:14,706 --> 00:01:25,530
+Ari wrote the email to the landlord. I can edit it, then open it in Gmail, Outlook or my email app. The app never sends anything on its own.
+
+6
+00:01:26,234 --> 00:01:41,903
+In Lecture 12, hidden white text fooled an AI. This lease hides a two thousand dollar cleaning fee, paid by wire, in white text. iConcierge reads only what a person can see, and shows the family what it removed.
+
+7
+00:01:42,618 --> 00:01:51,407
+Everything works in six languages, and answers come at five explanation levels, from explain like I'm five, to professional.
+
+8
+00:01:52,111 --> 00:02:00,720
+That whole question took about half a minute, and cost a fraction of a cent. iConcierge: a family office for every family.

@@ -1,6 +1,6 @@
 # iConcierge: final project submission checklist
 
-Checked against the requirements page on **2026-11-08**. **Due: Monday, Nov 23, 2026, 11:59 PM on Canvas.**
+Checked against the requirements page on **2026-11-08**; updated **2026-11-10** (Daily Update, Guest / Beta mode, demo video). **Due: Monday, Nov 23, 2026, 11:59 PM on Canvas.**
 Submit on Canvas: the repo link, `report.html`, `slides.html` (and, optionally, a demo video).
 
 | # | Requirement | Status | Evidence |
@@ -12,10 +12,10 @@ Submit on Canvas: the repo link, `report.html`, `slides.html` (and, optionally, 
 | 5 | `.env` checked in the repo folder first, then one folder up | ✅ | Dry run Nov 8 with `.env` one folder up: key found |
 | 6 | Fresh-clone dry run, running within 10 minutes | ✅ | Nov 8: install 4 min 13 s, first answer 17 s later, 32 tests passing |
 | 7 | Small test dataset if the real data is large | ✅ n/a | No large dataset. Demo files included: `output/demo_lease_with_hidden_text.pdf` |
-| 8 | `report.html`: sections 1–8 in order, 10–15 printed pages, self-contained | ✅ | 13 printed pages (letter); all screenshots embedded |
+| 8 | `report.html`: sections 1–8 in order, 10–15 printed pages, self-contained | ✅ | 15 printed pages (letter), the maximum: trim before adding anything; all screenshots embedded |
 | 9 | `slides.html`: reveal.js, 10 slides max, self-contained | ✅ | 10 slides; reveal.js 6.0.2 inlined so it opens offline by double-click (the page suggests a CDN; inlining is the same library and avoids a blank deck without internet) |
 | 10 | Real evidence in each report row | ⚠️ one gap | See below |
-| 11 | Optional demo video (2–3 min) | 📝 Script ready | `docs/demo_video_script.md` |
+| 11 | Optional demo video (2–3 min) | ✅ | `docs/video/iconcierge_demo-2.mp4` (2:04, 1080p, narrated, captions burned in + `.srt`); script in `docs/video/narration.json` |
 
 ## Evidence by report row (the half-credit rule)
 
@@ -24,12 +24,12 @@ Submit on Canvas: the repo link, `report.html`, `slides.html` (and, optionally, 
 | Motivation + what is new (8) | Named existing products | ✅ ChatGPT/Claude/Gemini, TurboTax, H&R Block, LegalZoom, Betterment, Wealthfront, Zillow, NerdWallet, 211, findhelp, New Haven Navigator |
 | Agent design (10) | Traced real run with screenshots | ✅ Run 3 traced step by step; round-table, answer and drafts screenshots |
 | Tokenomics (8) | Real token counts; cost per run, per user/month, at 100 and 10,000 users; cost cuts with evidence | ✅ 9 measured runs from the usage log; $1.83/month at 100 users, $183 at 10,000; −59% cost from reasoning-off + search cap |
-| Safety (8) | Screenshot or test of a defense working | ✅ Hidden-text and injection screenshots; 32 offline tests; live red team 9/9 |
+| Safety (8) | Screenshot or test of a defense working | ✅ Hidden-text and injection screenshots; 39 offline tests (Nov 10); live red team 9/9 (Nov 7, re-run before submitting) |
 | Impact + metrics (5) | A real user (quote, screenshot or before/after time) | ❌ **Missing.** Use `docs/real_user_test_kit.md` with 1–3 people, then add their quotes and timings to section 7 |
 | Design (2) | Clean, readable, sharp screenshots | ✅ |
 
 ## Before submitting
-1. Run one or more real-user tests and paste the results into section 7 of `docs/report_src.html`, then run `python docs/build.py`.
+1. Run one or more real-user tests (Guest / Beta mode makes this one click) and paste the results into section 7 of `docs/report_src.html`, then run `python docs/build.py`.
 2. Re-run `python tests/redteam.py` and `python -m unittest discover tests` if any code changed.
 3. Invite `zlisto` (or make the repo public).
 4. Do one last dry run: fresh clone, `.env` one folder up, README only.
