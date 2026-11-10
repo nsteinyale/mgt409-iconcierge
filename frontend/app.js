@@ -158,11 +158,22 @@ function showAuth(mode) {
         <div class="error" id="auth-error"></div>
         <button class="btn gold" type="submit">${esc(mode === "signup" ? t("next") : t("signin"))}</button>
       </form>
+      <div class="or-line"><span>${esc(t("or"))}</span></div>
+      <button class="btn guest-btn" type="button" id="guest">🎟️ ${esc(t("guest_btn"))}</button>
+      <small class="guest-hint">${esc(t("guest_hint"))}</small>
     </div>
   </div></div>`;
   playPageVideo();
   $(".lang-select").onchange = e => { setLang(e.target.value); showAuth(mode); };
   $$(".tabs button").forEach(b => b.onclick = () => showAuth(b.dataset.mode));
+  $("#guest").onclick = async () => {
+    const btn = $("#guest");
+    btn.disabled = true;
+    try {
+      state.me = await api("/api/guest", { method: "POST", body: { language: LANG } });
+      showApp();
+    } catch (ex) { $("#auth-error").textContent = errText(ex.message); btn.disabled = false; }
+  };
   $("#auth-form").onsubmit = async e => {
     e.preventDefault();
     const handle = $("#handle").value.trim().toLowerCase();
@@ -279,7 +290,8 @@ async function showApp() {
     <header class="topbar">
       <div class="brand">iConcierge<small class="brand-sub">${esc(t("subtitle"))}</small></div>
       ${langSelect()}
-      <span class="who">👪 ${esc(me.handle)}</span>
+      ${me.guest ? `<span class="guest-badge" title="${esc(t("guest_badge_tip"))}">🎟️ ${esc(t("guest_badge"))}</span>`
+                 : `<span class="who">👪 ${esc(me.handle)}</span>`}
       <button class="btn ghost small" id="signout">${esc(t("signout"))}</button>
     </header>
     <div class="main">
@@ -326,7 +338,8 @@ async function showApp() {
     state.me = await api("/api/me", { method: "PUT", body: { settings: { language: LANG } } });
     showApp();
   };
-  $("#signout").onclick = async () => { await api("/api/signout", { method: "POST" }).catch(() => {}); state.me = null; showAuth("signin"); };
+  $("#signout").onclick = async () => {
+    if (state.me?.guest && !confirm(t("guest_leave"))) return; await api("/api/signout", { method: "POST" }).catch(() => {}); state.me = null; showAuth("signin"); };
   $$(".side-tabs button").forEach(b => b.onclick = () => switchTab(b.dataset.tab));
   const ask = $("#ask");
   ask.addEventListener("input", () => { ask.style.height = "auto"; ask.style.height = Math.min(ask.scrollHeight, 160) + "px"; });

@@ -130,6 +130,12 @@ def init() -> None:
 
 # --- families -----------------------------------------------------------------
 
+def purge_guests(older_than: float) -> int:
+    """Delete Guest / Beta spaces created before `older_than` (their to-dos, documents and drafts cascade)."""
+    with connect() as conn:
+        return conn.execute("DELETE FROM families WHERE handle LIKE 'guest-%' AND created_at < ?", (older_than,)).rowcount
+
+
 def create_family(handle: str, salt: str, pw_hash: str, settings: dict, profile: dict) -> int:
     with connect() as conn:
         cur = conn.execute(

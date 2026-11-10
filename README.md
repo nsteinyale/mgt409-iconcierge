@@ -58,7 +58,9 @@ Then start it:
 python run.py
 ```
 
-Your browser opens http://127.0.0.1:8765. Click **Create a family account**, finish the 3 setup steps, then pick
+Your browser opens http://127.0.0.1:8765. To look around fast, click **🎟️ Guest / Beta mode**: no account, a
+private guest space in this browser (Captain Rosa, default settings), limited to 10 new guests per address per hour
+and removed after 7 days. Or click **Create a family account**, finish the 3 setup steps, then pick
 a topic under **"What do you want help with?"** (starting a company, planning a move, investing, taxes, buying a
 home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 8, 2026
 took 4 min 13 s to install and answered its first question 17 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)

@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import time
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
@@ -57,8 +58,8 @@ def clean_profile(raw: dict) -> dict:
 
 
 def family_dict(row) -> dict:
-    return {"id": row["id"], "handle": row["handle"], "settings": json.loads(row["settings_json"]),
-            "profile": json.loads(row["profile_json"])}
+    return {"id": row["id"], "handle": row["handle"], "guest": auth.is_guest(row["handle"]),
+            "settings": json.loads(row["settings_json"]), "profile": json.loads(row["profile_json"])}
 
 
 def current_family(request: Request) -> dict:
@@ -95,6 +96,29 @@ def signup(body: SignUp, response: Response):
         family_id = auth.sign_up(body.handle, body.passcode, clean_settings(body.settings), clean_profile(body.profile))
     except auth.AuthError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    set_session_cookie(response, family_id)
+    return family_dict(db.family_by_id(family_id))
+
+
+class Guest(BaseModel):
+    language: str = "en"
+
+
+GUEST_STARTS: dict[str, list[float]] = {}     # client address -> recent guest sign-ins (containment)
+
+
+@app.post("/api/guest")
+def guest(body: Guest, request: Request, response: Response):
+    """Guest / Beta mode: try the app without an account. Limited per address per hour."""
+    now = time.time()
+    who = request.client.host if request.client else "unknown"
+    recent = [t for t in GUEST_STARTS.get(who, []) if now - t < 3600]
+    if len(recent) >= config.MAX_GUESTS_PER_HOUR:
+        raise HTTPException(status_code=429, detail="rate_limited")
+    GUEST_STARTS[who] = recent + [now]
+    settings = clean_settings({"language": body.language, "help_mode": "family", "captain_style": "warm",
+                               "captain_avatar": "captain_b", "captain_name": "Rosa", "explain_level": "beginner"})
+    family_id = auth.sign_up_guest(settings)
     set_session_cookie(response, family_id)
     return family_dict(db.family_by_id(family_id))
 

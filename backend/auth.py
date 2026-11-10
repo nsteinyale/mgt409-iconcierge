@@ -49,9 +49,19 @@ def new_session(family_id: int) -> str:
     return token
 
 
+GUEST_PREFIX = "guest-"      # reserved for Guest / Beta mode
+GUEST_DAYS = 7               # guest spaces are removed after a week
+
+
+def is_guest(handle: str) -> bool:
+    return (handle or "").startswith(GUEST_PREFIX)
+
+
 def sign_up(handle: str, passcode: str, settings: dict, profile: dict) -> int:
     handle = normalize_handle(handle)
     check_new_credentials(handle, passcode)
+    if is_guest(handle):
+        raise AuthError("handle_taken")
     if db.family_by_handle(handle):
         raise AuthError("handle_taken")
     salt, pw_hash = hash_passcode(passcode)
@@ -68,3 +78,17 @@ def sign_in(handle: str, passcode: str) -> int:
         raise AuthError("wrong_login")
     db.clear_login_failures(handle)
     return int(row["id"])
+
+
+def sign_up_guest(settings: dict) -> int:
+    """Guest / Beta mode: a private space with a random name and a random passcode nobody sees.
+
+    The browser keeps it through the session cookie; signing out ends access. Old guest spaces are purged.
+    """
+    db.purge_guests(time.time() - GUEST_DAYS * 86400)
+    for _ in range(5):
+        handle = GUEST_PREFIX + secrets.token_hex(4)
+        if not db.family_by_handle(handle):
+            break
+    salt, pw_hash = hash_passcode(secrets.token_urlsafe(24))
+    return db.create_family(handle, salt, pw_hash, settings, {})
