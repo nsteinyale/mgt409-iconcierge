@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from backend import auth, daily, db, llm  # noqa: E402
 
 FAKE_TIPS = {"tips": [
-    {"member": "captain", "title": "Meet a counselor", "tip": "One option is a HUD-approved housing counselor.", "source_id": "hud-housing-counselor"},
+    {"member": "captain", "opener": "Here is your plan for today:", "title": "Meet a counselor", "tip": "One option is a HUD-approved housing counselor.", "source_id": "hud-housing-counselor"},
     {"member": "accountant", "title": "Check withholding",
      "tip": "It can help to check withholding. Details at https://evil.example.com/claim now.", "source_id": "irs-withholding-estimator"},
     {"member": "investor", "title": "Compare savings", "tip": "One option is to compare savings choices.", "source_id": "made-up-source"},
@@ -50,6 +50,8 @@ class DailyUpdate(unittest.TestCase):
         self.assertEqual(tip["captain"]["source"]["id"], "hud-housing-counselor")
         self.assertIsNone(tip["investor"]["source"])                                 # unknown source ids are not shown
         self.assertIn("Options, not orders", self.system)
+        self.assertEqual(tip["captain"]["opener"], "Here is your plan for today:")   # in-character first line
+        self.assertIn("personality:", self.system)
         again = asyncio.run(daily.daily_update(self.family))
         self.assertEqual(self.calls, 1)                                              # one AI call per family per day
         self.assertEqual(again, r)

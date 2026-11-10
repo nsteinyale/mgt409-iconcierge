@@ -387,21 +387,38 @@ body:has(.page-video) { background: #14213d; }
   color: var(--navy); font-weight: 600; max-width: 190px; }
 .level-select:focus { outline: 2px solid var(--gold); }
 
-/* ---------- Daily Update ---------- */
-.daily { display: flex; flex-direction: column; gap: .6rem; }
+/* ---------- Daily Update: big faces, speech bubbles ---------- */
+.daily { display: flex; flex-direction: column; gap: 1rem; }
 .daily-head h3 { margin: 0; color: var(--navy); font-size: 1.05rem; }
 .daily-head small { color: var(--muted); text-transform: capitalize; }
 .daily-head p { margin: .35rem 0 0; color: var(--muted); font-size: .85rem; }
-.daily-tip { display: flex; gap: .65rem; align-items: flex-start; padding: .7rem; border: 1px solid var(--line); border-radius: 12px; background: #fff; border-left: 4px solid var(--gold); }
-.daily-tip .avatar { flex: none; }
-.daily-tip .who { font-weight: 700; font-size: .88rem; }
-.daily-tip .who small { font-weight: 500; color: var(--muted); }
-.daily-tip h4 { margin: .15rem 0 .2rem; font-size: .95rem; color: var(--navy); }
-.daily-tip p { margin: 0; font-size: .88rem; line-height: 1.45; }
-.daily-foot { display: flex; flex-wrap: wrap; gap: .4rem .7rem; align-items: center; justify-content: space-between; margin-top: .45rem; }
-.daily-foot a { font-size: .78rem; color: var(--muted); }
+.daily-tip { display: flex; gap: .9rem; align-items: flex-start; opacity: 0;
+  animation: daily-in .45s ease-out forwards; animation-delay: calc(var(--i) * .18s); }
+.daily-tip.from-right { flex-direction: row-reverse; }
+.daily-tip .speaker { flex: none; width: 96px; text-align: center; }
+.daily-tip .speaker .avatar { margin: 0 auto .3rem; width: 88px; height: 88px; }
+.daily-tip .speaker .avatar-photo { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--gold), 0 6px 14px rgba(15, 27, 54, .25); }
+.daily-tip .speaker .ai-badge { font-size: .62rem; }
+.daily-tip .speaker .who { font-weight: 800; color: var(--navy); font-size: .92rem; line-height: 1.1; }
+.daily-tip .speaker small { display: block; color: var(--muted); font-size: .7rem; line-height: 1.2; }
+.daily-tip .speech { position: relative; flex: 1; min-width: 0; background: #fff; border: 1.5px solid #e6d3a6;
+  border-radius: 18px; padding: .75rem .9rem .7rem; box-shadow: 0 4px 14px rgba(15, 27, 54, .08); }
+/* the tail points at the speaker's mouth */
+.daily-tip .speech::before, .daily-tip .speech::after { content: ""; position: absolute; top: 52px; border: 11px solid transparent; }
+.daily-tip.from-left .speech::before { left: -22px; border-right-color: #e6d3a6; }
+.daily-tip.from-left .speech::after { left: -19px; border-right-color: #fff; }
+.daily-tip.from-right .speech::before { right: -22px; border-left-color: #e6d3a6; }
+.daily-tip.from-right .speech::after { right: -19px; border-left-color: #fff; }
+.daily-tip .hello { font-size: .9rem; color: var(--navy); margin-bottom: .35rem; }
+.daily-tip .hello strong { color: #b07d1e; }
+.daily-tip h4 { margin: .1rem 0 .25rem; font-size: .98rem; color: var(--navy); }
+.daily-tip p { margin: 0; font-size: .9rem; line-height: 1.5; }
+.daily-foot { display: flex; flex-wrap: wrap; gap: .4rem .7rem; align-items: center; justify-content: space-between; margin-top: .55rem; }
+.daily-foot a { font-size: .76rem; color: var(--muted); }
 .daily-loading { display: flex; gap: .6rem; align-items: center; justify-content: center; }
 .daily-cost { text-align: center; font-size: .75rem; color: var(--muted); }
+@keyframes daily-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .daily-tip { animation: none; opacity: 1; } }
 
 /* ---------- Guest / Beta mode ---------- */
 .or-line { display: flex; align-items: center; gap: .6rem; margin: 1rem 0 .7rem; color: var(--muted); font-size: .8rem; }

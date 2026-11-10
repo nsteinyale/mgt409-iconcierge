@@ -396,15 +396,22 @@ function announceDaily() {          // each seat says its headline once, one aft
   }, 700 + i * 1100));
 }
 
+function greeting() {               // "Good morning!" / "Good afternoon!" / "Good evening!" by the family's clock
+  const h = new Date().getHours();
+  return t(h < 12 ? "greet_morning" : h < 18 ? "greet_afternoon" : "greet_evening");
+}
+
 function dailyHTML() {
   const d = state.daily;
   if (!d || d.loading) return `<div class="feed-empty daily-loading">${avatarHTML("captain", "sm", "is-thinking")}<span>${esc(t("daily_loading"))}</span></div>`;
   if (d.error || !(d.tips || []).length) return `<div class="feed-empty">${esc(t("daily_error"))}<br><button class="btn small ghost" id="daily-retry">${esc(t("daily_retry"))}</button></div>`;
   const day = new Date(d.day + "T12:00:00").toLocaleDateString(LANG, { weekday: "long", month: "long", day: "numeric" });
   return `<div class="daily-head"><h3>☀️ ${esc(t("daily_title"))}</h3><small>${esc(day)}</small><p>${esc(t("daily_intro"))}</p></div>
-    ${d.tips.map((tip, i) => `<article class="daily-tip">
-      ${avatarHTML(tip.member, "sm")}
-      <div class="grow"><div class="who">${esc(personName(tip.member))} <small>· ${esc(t("role_" + tip.member))}</small></div>
+    ${d.tips.map((tip, i) => `<article class="daily-tip ${i % 2 ? "from-right" : "from-left"}" style="--i:${i}">
+      <div class="speaker">${avatarHTML(tip.member, "lg", "daily-face")}
+        <div class="who">${esc(personName(tip.member))}</div><small>${esc(t("role_" + tip.member))}</small></div>
+      <div class="speech">
+        <div class="hello"><strong>${esc(greeting())}</strong> ${esc(tip.opener || "")}</div>
         <h4>${esc(tip.title)}</h4><p>${esc(tip.tip)}</p>
         <div class="daily-foot">${tip.source ? `<a href="${esc(tip.source.url)}" target="_blank" rel="noopener noreferrer">${esc(t("daily_source"))}: ${esc(tip.source.title)}</a>` : ""}
           <button class="btn small ghost" data-daily-ask="${i}">💬 ${esc(t("daily_ask"))}</button></div></div>
