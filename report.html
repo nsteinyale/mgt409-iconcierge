@@ -231,6 +231,7 @@
   <tr><td><b>Prompt caching</b> (stable system prompts first, growing tool history after)</td><td>39% of all input tokens were served from cache at one-tenth the price, saving $0.0043 of $0.0208 (21%) across the 9 runs.</td></tr>
   <tr><td><b>Answer in code when no AI is needed</b></td><td>Crisis messages: 0 calls, $0. Requests the provider's filter blocks: 0 billed calls. Harmful requests: 1 call ($0.0001) and no specialists.</td></tr>
   <tr><td><b>Hard limits</b>: 3 specialists, 4 tool rounds, small output caps (huddle 200 tokens, plan 900), and a <b>$0.01 spending cap per question</b> that stops the team and tells the family</td><td>Worst run seen: 18 calls, $0.0036, about a third of the cap. No runaway loops in any test.</td></tr>
+  <tr><td><b>Did any cut hurt performance?</b></td><td>Numbers: no. They come from calculators, identical before and after (unit tests). Safety: no; the red team scored 9/9 after the cuts (re-run Nov 12). Depth: possibly. Our real user asked for "more in-depth" answers, which the 2-search cap and short answer format may cause; the explanation level is the lever.</td></tr>
   <tr><td><b>Only the specialists who are needed</b></td><td>Single-domain questions use 1 specialist and 4 calls ($0.0008–$0.0013), about half the cost of multi-domain ones.</td></tr>
 </table>
 

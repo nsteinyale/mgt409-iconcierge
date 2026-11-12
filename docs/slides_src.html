@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>iConcierge: Your Personal Family Office | MGT 409 Final Project</title>
+<!-- reveal.js 6.0.2 from the CDN, plus an embedded copy of the same files so the deck also works offline -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.css">
 <style>{{CSS:reset.css}}</style>
 <style>{{CSS:reveal.css}}</style>
 <style>
@@ -198,8 +201,10 @@
 </section>
 
 </div></div>
-<script>{{JS:reveal.js}}</script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@6.0.2/dist/reveal.js"></script>
+<script type="text/plain" id="reveal-offline">{{JS:reveal.js}}</script>
 <script>
+  if (!window.Reveal) (0, eval)(document.getElementById("reveal-offline").textContent);   // no internet: use the embedded copy
   Reveal.initialize({ hash: true, slideNumber: "c/t", progress: true, center: true, transition: "slide",
                       width: 1280, height: 760, margin: 0.06 });
 </script>
