@@ -3,8 +3,9 @@
 The rubric's Impact row needs a real user: a quote, a screenshot, or a before-and-after time. One to three people is
 enough. Good testers: a family member, a classmate who rents, a friend starting a side business.
 
-**Simplest way: let the app record it.** Testers click **🎟️ Guest / Beta mode** and ask their questions; nothing else
-is needed. For guests only, the app saves on this computer: each question (private numbers masked), the answer, the
+**Simplest way: let the app record it.** Add `ICONCIERGE_BETA=1` to `.env` (or set it before `python run.py`) and restart
+the app. The button then reads **🎟️ Guest / Beta mode**; testers click it and ask their questions; nothing else
+is needed. Without the switch, Guest mode records nothing. For guests only, the app saves on this computer: each question (private numbers masked), the answer, the
 team, time and cost, the safety checks, what they clicked (tabs, topics, Daily Update, drafts, language, level) and
 a 1–5 rating with an optional comment and "OK to quote" box shown under every answer. The guest screen says so. Then:
 
@@ -20,7 +21,7 @@ without iConcierge, plus the follow-up questions. The steps below are that longe
 
 ## Before you start
 - Start the app (`python run.py`) and open http://localhost:8765 on your computer.
-- Each tester clicks **🎟️ Guest / Beta mode**: a fresh private space in one click, no account. Don't sign them out
+- With `ICONCIERGE_BETA=1` on, each tester clicks **🎟️ Guest / Beta mode**: a fresh private space in one click, no account. Don't sign them out
   afterward; their run stays in the app's log, so the exact question, answer, time and cost can be pulled for the report.
 - Tell them: "This is a class prototype. It gives general information, not legal, tax or investment advice. Please
   don't type real Social Security, account or card numbers; ranges and made-up numbers are fine."

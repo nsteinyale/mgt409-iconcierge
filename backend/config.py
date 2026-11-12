@@ -46,6 +46,7 @@ SESSION_COOKIE = "ic_session"
 SESSION_DAYS = 14
 MAX_GUESTS_PER_HOUR = 10          # Guest / Beta mode sign-ins per address per hour
 MAX_BETA_EVENTS_PER_HOUR = 300    # beta clicks and ratings a guest can log per hour
+BETA_MODE = os.getenv("ICONCIERGE_BETA") == "1"   # user tests: record guest sessions + show a rating box (off by default)
 
 LANGUAGES = {
     "en": "English",

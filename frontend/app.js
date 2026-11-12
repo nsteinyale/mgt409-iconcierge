@@ -110,6 +110,7 @@ async function boot() {
     const roster = await api("/api/roster");
     state.roster = roster.specialists;
     PORTRAITS = roster.portraits || {};
+    state.beta = !!roster.beta;            // beta tests only: record guest sessions + rating box
   } catch { /* shown later */ }
   try {
     state.me = await api("/api/me");
@@ -159,8 +160,8 @@ function showAuth(mode) {
         <button class="btn gold" type="submit">${esc(mode === "signup" ? t("next") : t("signin"))}</button>
       </form>
       <div class="or-line"><span>${esc(t("or"))}</span></div>
-      <button class="btn guest-btn" type="button" id="guest">🎟️ ${esc(t("guest_btn"))}</button>
-      <small class="guest-hint">${esc(t("guest_hint"))}</small>
+      <button class="btn guest-btn" type="button" id="guest">🎟️ ${esc(t(state.beta ? "guest_btn_beta" : "guest_btn"))}</button>
+      <small class="guest-hint">${esc(t(state.beta ? "guest_hint_beta" : "guest_hint"))}</small>
     </div>
   </div></div>`;
   playPageVideo();
@@ -290,7 +291,7 @@ async function showApp() {
     <header class="topbar">
       <div class="brand">iConcierge<small class="brand-sub">${esc(t("subtitle"))}</small></div>
       ${langSelect()}
-      ${me.guest ? `<span class="guest-badge" title="${esc(t("guest_badge_tip"))}">🎟️ ${esc(t("guest_badge"))}</span>`
+      ${me.guest ? `<span class="guest-badge" title="${esc(t("guest_badge_tip"))}">🎟️ ${esc(t(state.beta ? "guest_badge_beta" : "guest_badge"))}</span>`
                  : `<span class="who">👪 ${esc(me.handle)}</span>`}
       <button class="btn ghost small" id="signout">${esc(t("signout"))}</button>
     </header>
@@ -532,7 +533,7 @@ async function send() {
     const stats = (totals ? `<div class="stats">${esc(t("stats", { calls: totals.calls, cost: totals.cost.toFixed(4), seconds: Math.round(totals.seconds) }))}</div>` : "") + shield;
     chat.insertAdjacentHTML("beforeend", captainBubble(renderMarkdown(summary.answer, summary.sources) + sources +
       (todos ? `<div class="todo-chips"><strong>${esc(t("todos_added"))}</strong>${todos}</div>` : "") + draftChip + stats +
-      (state.me?.guest ? feedbackHTML(state.lastRunId) : "")));
+      (state.me?.guest && state.beta ? feedbackHTML(state.lastRunId) : "")));
     const last = chat.lastElementChild;
     wireFeedback($(".beta-fb", last));
     $(".open-drafts", last)?.addEventListener("click", e => { e.preventDefault(); switchTab("drafts"); });
@@ -561,9 +562,9 @@ function talk(id, ms = 1600) {
   if (RoundTable.ready) RoundTable.talk(id, ms);
 }
 
-// Guest / Beta mode: record clicks and ratings on this computer so real-user tests need no paperwork.
+// Beta tests (ICONCIERGE_BETA=1): record guests' clicks and ratings on this computer so user tests need no paperwork.
 function beta(kind, data = {}) {
-  if (!state.me?.guest) return;
+  if (!state.me?.guest || !state.beta) return;
   fetch("/api/beta", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ kind, data }) }).catch(() => {});
 }

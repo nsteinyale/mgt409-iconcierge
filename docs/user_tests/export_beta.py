@@ -1,4 +1,4 @@
-"""Summarize Guest / Beta test sessions from the app's log into a Markdown file for the report.
+"""Summarize beta-test guest sessions (recorded only with ICONCIERGE_BETA=1) from the app's log into a Markdown file for the report.
 
 Run from the iConcierge folder:
     python docs/user_tests/export_beta.py                      # every guest session

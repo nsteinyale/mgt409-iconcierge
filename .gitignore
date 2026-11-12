@@ -5,4 +5,6 @@ __pycache__/
 *.pyc
 media_source/
 docs/video/iconcierge_demo-1.*
+docs/video/iconcierge_demo-2.*
+docs/video/iconcierge_demo-3.*
 docs/user_tests/results/

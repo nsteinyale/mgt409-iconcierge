@@ -58,9 +58,10 @@ Then start it:
 python run.py
 ```
 
-Your browser opens http://127.0.0.1:8765. To look around fast, click **🎟️ Guest / Beta mode**: no account, a
+Your browser opens http://127.0.0.1:8765. To look around fast, click **🎟️ Guest mode**: no account, a
 private guest space in this browser (Captain Rosa, default settings), limited to 10 new guests per address per hour
-and removed after 7 days. Or click **Create a family account**, finish the 3 setup steps, then pick
+and removed after 7 days. Nothing about guests is recorded unless you run a user test with `ICONCIERGE_BETA=1`
+(see `docs/real_user_test_kit.md`): then guest sessions are logged on this computer and each answer gets an optional rating box. Or click **Create a family account**, finish the 3 setup steps, then pick
 a topic under **"What do you want help with?"** (starting a company, planning a move, investing, taxes, buying a
 home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 12, 2026
 took 2 min 3 s to install (45 tests passing) and answered its first question 28 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)

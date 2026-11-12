@@ -109,7 +109,7 @@ GUEST_STARTS: dict[str, list[float]] = {}     # client address -> recent guest s
 
 @app.post("/api/guest")
 def guest(body: Guest, request: Request, response: Response):
-    """Guest / Beta mode: try the app without an account. Limited per address per hour."""
+    """Guest mode: try the app without an account. Limited per address per hour."""
     now = time.time()
     who = request.client.host if request.client else "unknown"
     recent = [t for t in GUEST_STARTS.get(who, []) if now - t < 3600]
@@ -119,7 +119,8 @@ def guest(body: Guest, request: Request, response: Response):
     settings = clean_settings({"language": body.language, "help_mode": "family", "captain_style": "warm",
                                "captain_avatar": "captain_b", "captain_name": "Rosa", "explain_level": "beginner"})
     family_id = auth.sign_up_guest(settings)
-    db.log_beta(family_id, db.family_by_id(family_id)["handle"], "session_start", {"language": settings["language"]})
+    if config.BETA_MODE:
+        db.log_beta(family_id, db.family_by_id(family_id)["handle"], "session_start", {"language": settings["language"]})
     set_session_cookie(response, family_id)
     return family_dict(db.family_by_id(family_id))
 
@@ -199,7 +200,7 @@ async def ask(body: Ask, family: dict = Depends(current_family)):
         seen: dict[str, Any] = {"specialists": []}
         started = time.time()
         async for event in team.run_question(family, body.question, doc_ids):
-            if family["guest"]:
+            if config.BETA_MODE and family["guest"]:
                 kind = event.get("type")
                 if kind == "run_started":
                     seen["run_id"] = event.get("run_id")
@@ -208,7 +209,7 @@ async def ask(body: Ask, family: dict = Depends(current_family)):
                 elif kind in ("captain_summary", "safety_summary", "done"):
                     seen[kind] = event
             yield json.dumps(event, ensure_ascii=False) + "\n"
-        if family["guest"] and seen.get("run_id"):
+        if config.BETA_MODE and family["guest"] and seen.get("run_id"):
             run = db.get_run(family["id"], seen["run_id"]) or {}
             summary, done = seen.get("captain_summary") or {}, seen.get("done") or {}
             db.log_beta(family["id"], family["handle"], "run", {
@@ -233,8 +234,8 @@ class BetaEvent(BaseModel):
 
 @app.post("/api/beta")
 def beta_event(body: BetaEvent, family: dict = Depends(current_family)):
-    """Guest / Beta mode only: record what testers click and how they rate answers (stays on this computer)."""
-    if not family["guest"] or body.kind not in BETA_KINDS:
+    """Beta tests only (ICONCIERGE_BETA=1): record what guests click and how they rate answers (stays on this computer)."""
+    if not config.BETA_MODE or not family["guest"] or body.kind not in BETA_KINDS:
         return {"ok": False}
     if db.count_beta_since(family["id"], 3600) >= config.MAX_BETA_EVENTS_PER_HOUR:
         raise HTTPException(status_code=429, detail="rate_limited")
@@ -290,7 +291,7 @@ def portraits() -> dict:
 def roster():
     return {"specialists": team.ROSTER, "captain_styles": list(team.CAPTAIN_STYLES),
             "help_modes": list(team.HELP_MODES), "languages": config.LANGUAGES, "model": config.MODEL_NAME,
-            "portraits": portraits()}
+            "portraits": portraits(), "beta": config.BETA_MODE}
 
 
 # --- to-dos ----------------------------------------------------------------------

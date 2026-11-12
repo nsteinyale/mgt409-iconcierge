@@ -47,6 +47,8 @@ class GuestMode(unittest.TestCase):
         self.assertIsNone(db.family_by_id(fid))
 
     def test_beta_log_records_guests_only(self):
+        config.BETA_MODE = True
+        self.addCleanup(setattr, config, "BETA_MODE", False)
         guest, member = TestClient(main.app), TestClient(main.app)
         g = guest.post("/api/guest", json={}).json()
         member.post("/api/signup", json={"handle": f"beta-member-{time.time_ns() % 10**8}", "passcode": "secret123"})
@@ -62,12 +64,24 @@ class GuestMode(unittest.TestCase):
         self.assertEqual(logged[0]["run_id"], 7)
 
     def test_beta_log_survives_guest_purge(self):
+        config.BETA_MODE = True
+        self.addCleanup(setattr, config, "BETA_MODE", False)
         c = TestClient(main.app)
         g = c.post("/api/guest", json={}).json()
         c.post("/api/beta", json={"kind": "tab", "data": {"tab": "daily"}})
         db.purge_guests(time.time() + 1)
         self.assertIsNone(db.family_by_id(g["id"]))
         self.assertTrue(any(r["family_id"] == g["id"] for r in db.list_beta()))
+
+    def test_plain_guest_mode_records_nothing(self):
+        config.BETA_MODE = False
+        c = TestClient(main.app)
+        since = time.time() - 1
+        g = c.post("/api/guest", json={}).json()
+        self.assertTrue(g["guest"])
+        self.assertFalse(c.post("/api/beta", json={"kind": "tab", "data": {"tab": "docs"}}).json()["ok"])
+        self.assertFalse(c.get("/api/roster").json()["beta"])
+        self.assertEqual([r for r in db.list_beta(since) if r["family_id"] == g["id"]], [])
 
 
 if __name__ == "__main__":
