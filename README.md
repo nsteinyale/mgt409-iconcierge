@@ -64,14 +64,14 @@ and removed after 7 days. Nothing about guests is recorded unless you run a user
 (see `docs/real_user_test_kit.md`): then guest sessions are logged on this computer and each answer gets an optional rating box. Or click **Create a family account**, finish the 3 setup steps, then pick
 a topic under **"What do you want help with?"** (starting a company, planning a move, investing, taxes, buying a
 home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 12, 2026
-took 2 min 3 s to install (45 tests passing) and answered its first question 28 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
+took 2 min 3 s to install (all tests passing) and answered its first question 28 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
 
 Use the **🎓 Explanations** menu in the chat header to pick how answers are written: *Explain like I'm 5*, Beginner
 (default), Intermediate, Advanced or Professional. It is also in setup and the Profile tab.
 
 The **☀️ Daily Update** tab opens first: one idea of the day from each member of the round table (the Captain,
 Ava, Marcus, Priya, Leo, Grace and Ari), each tied to a vetted source and fitted to the family's profile, with an
-"Ask about this" button. One AI call writes all seven (about $0.0004), and it is cached per family, day, language
+"Ask about this" button. One AI call writes all seven (about $0.0005), and it is cached per family, day, language
 and explanation level, so a family pays for it at most once a day. Tips pass the same output guard as answers.
 
 The app uses `gpt-6-luna` through the course Portkey key. With a personal `OPENAI_API_KEY` instead, set
@@ -102,11 +102,11 @@ steps in, it shows live in **The office**, in a footer under each answer and in 
 **Tested two ways:**
 
 ```bash
-python -m unittest discover tests      # 31 tests, no API key: calculators, sign-in, drafts and attacks on every guard
+python -m unittest discover tests      # 46 tests, no API key: calculators, sign-in, drafts and attacks on every guard
 python tests/redteam.py                # live attacks through the real AI team -> output/redteam_report.md
 ```
 
-Live red-team result on 2026-11-07: **9 of 9 attacks stopped**, including a scam address planted for Ari's email
+Live red-team result (2026-11-07, re-run 2026-11-12): **9 of 9 attacks stopped**, including a scam address planted for Ari's email
 and a control question with no false alarms (full table in `output/redteam_report.md`). The red team caught two real
 bugs: the "list documents" tool was handing the AI the hidden text it had just removed, and the number audit flagged
 the family's own profile income range as made up. Both fixed, then re-tested. Try it yourself with
@@ -131,13 +131,18 @@ lockout, validation) and attacks on every safety guard.
 ## Cost and speed (measured)
 
 Each AI call is logged with its tokens and cost in the `usage` table (course prices: $0.10 / 1M input,
-$0.01 / 1M cached input, $0.50 / 1M output). Measured runs on 2026-11-07:
+$0.01 / 1M cached input, $0.50 / 1M output). Nine measured runs on the final version (2026-11-12) averaged
+9.3 AI calls, 15,344 input tokens (45% cached), 1,831 output tokens, **$0.0020 and 27 s** per question; for example:
 
 | Question | Specialists | AI calls | Cost | Time |
 |---|---|---|---|---|
-| Can we afford a $350k home, and taxes? | 2 | 11 | $0.0019 | 24 s |
-| Card debt vs. Roth IRA + renters insurance | 3 | 14 | $0.0027 | 22 s |
-| Lease question with an uploaded document | 1 | 4 | $0.0010 | 14 s |
+| Can we afford to buy a home next year? | 2 | 12 | $0.0023 | 33 s |
+| Card debt vs. Roth IRA + renters insurance | 3 | 15 | $0.0032 | 32 s |
+| Lease question with an uploaded document | 1 | 5 | $0.0014 | 21 s |
+
+**Team vs. one agent (blind test, 2026-11-12):** on the same 9 questions, one agent with the same tools and guards
+scored higher than the team in two blind rounds at about a quarter of the cost; both beat the plain model on errors.
+Details, scripts and all answers: `docs/eval/README.md` and section 7 of the report.
 
 ## Project layout
 

@@ -258,9 +258,15 @@ def loan_payoff(ctx: ToolContext, balance: float, apr_percent: float, monthly_pa
     if p <= b * r:
         return {"error": "The payment does not cover the monthly interest, so the balance never goes down.",
                 "monthly_interest": _money(b * r)}
-    months = math.ceil(-math.log(1 - b * r / p) / math.log(1 + r)) if r else math.ceil(b / p)
-    return {"months_to_pay_off": months, "years": round(months / 12, 1),
-            "total_interest": _money(p * months - b if r else 0)}
+    # Month by month, so the last (partial) payment is counted correctly; 600 months is a safety stop.
+    months, interest, left = 0, 0.0, b
+    while left > 0.005 and months < 600:
+        charge = left * r
+        interest += charge
+        left = left + charge - min(p, left + charge)
+        months += 1
+    return {"months_to_pay_off": months, "years": round(months / 12, 1), "total_interest": _money(interest),
+            "total_paid": _money(b + interest)}
 
 
 # --- lookups ---------------------------------------------------------------------

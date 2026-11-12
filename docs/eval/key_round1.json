@@ -1,0 +1,47 @@
+{
+ "q1": {
+  "A": "team",
+  "B": "solo",
+  "C": "plain"
+ },
+ "q2": {
+  "A": "plain",
+  "B": "solo",
+  "C": "team"
+ },
+ "q3": {
+  "A": "solo",
+  "B": "team",
+  "C": "plain"
+ },
+ "q4": {
+  "A": "plain",
+  "B": "team",
+  "C": "solo"
+ },
+ "q5": {
+  "A": "solo",
+  "B": "team",
+  "C": "plain"
+ },
+ "q6": {
+  "A": "team",
+  "B": "solo",
+  "C": "plain"
+ },
+ "q7": {
+  "A": "solo",
+  "B": "plain",
+  "C": "team"
+ },
+ "q8": {
+  "A": "plain",
+  "B": "team",
+  "C": "solo"
+ },
+ "q9": {
+  "A": "solo",
+  "B": "team",
+  "C": "plain"
+ }
+}

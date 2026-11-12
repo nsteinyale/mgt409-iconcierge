@@ -61,6 +61,10 @@ class Calculators(unittest.TestCase):
         r = tools.loan_payoff(CTX, 8_000, 24, 350)
         self.assertEqual(r["months_to_pay_off"], 31)
         self.assertIn("error", tools.loan_payoff(CTX, 8_000, 24, 100))
+        small = tools.loan_payoff(CTX, 3_000, 24, 500)          # last payment is partial: interest is ~$229, not $500
+        self.assertEqual(small["months_to_pay_off"], 7)
+        self.assertLess(abs(small["total_interest"] - 228.92), 0.01)
+        self.assertEqual(tools.loan_payoff(CTX, 5_000, 24, 500)["months_to_pay_off"], 12)   # 11 full payments + a partial one
 
     def test_savings_growth_zero_rate(self):
         r = tools.savings_growth(CTX, 1_000, 100, 0, 1)

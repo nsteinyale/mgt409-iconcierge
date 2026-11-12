@@ -79,7 +79,7 @@
   <div class="grid2">
     <div class="card"><b>🏢 A team around a 3D round table</b><br>The Captain assigns up to 3 specialists who work in parallel and leave each other notes; every event travels across the table as a ping.</div>
     <div class="card"><b>🧮 Every number from code, every link vetted</b><br>9 calculators (2026 IRS brackets, mortgage, rent vs. buy…) and 42 official sources; an audit traces every number.</div>
-    <div class="card"><b>☀️ A Daily Update from the team</b><br>Each member greets the family in their own voice with one sourced idea a day: one cached call, $0.0004. Guest mode: no sign-up.</div>
+    <div class="card"><b>☀️ A Daily Update from the team</b><br>Each member greets the family in their own voice with one sourced idea a day: one cached call, $0.0005. Guest mode: no sign-up.</div>
     <div class="card"><b>🧭 Options, not orders</b><br>Trade-offs and numbers; the family decides, and we flag when to hire a pro.</div>
     <div class="card"><b>✉️ Ari, My AI Assistant</b><br>Turns the advice into email drafts → Gmail, Outlook, your email app or your own Claude/ChatGPT. Never sends anything itself.</div>
     <div class="card"><b>🌍 Six languages + Lecture 12 defenses</b><br>English, Español, 中文, Português, Français, বাংলা. Hidden text in files never reaches the AI.</div>
@@ -112,34 +112,35 @@
 <section>
   <h2>Demo: the team around the table</h2>
   <div class="grid2">
-    <div><img src="{{IMG:07_round_table-3.jpg}}" alt="Round table"><p class="muted">Pings: assign (gold), tool (blue), findings (green), notes (orange), hand-off to Ari (purple). Replay any run.</p></div>
+    <div><img src="{{IMG:13_traced_run_live-2.jpg}}" alt="Round table"><p class="muted">The traced run at 13 s: pings to the toolbox, per-seat costs, live spend meter and Activity feed.</p></div>
     <div><img src="{{IMG:11_daily_update-4.jpg}}" alt="Daily Update"><p class="muted">The Daily Update: one idea per member, in their own voice. Ari's drafts open in Gmail, Outlook or your email app; nothing is sent.</p></div>
   </div>
-  <p style="font-size:.55em">Traced run: 3 specialists → <b>$12,000 covers 4 months</b> of essentials; with $6,000 vs. $12,000 down the payment differs by <b>$40/month</b>. Leo flagged that the saved profile conflicted with the message. <b>13 calls · $0.0030 · 25 s.</b></p>
+  <p style="font-size:.55em">Traced run (final version): 3 specialists; in the huddle Grace caught Marcus's emergency-fund figure (<b>$12,000 = 4 months</b> at $3,000/month, not 3.4), and the Captain flagged Texas vs. Connecticut. <b>14 calls · $0.0028 · 29 s.</b></p>
 </section>
 
 <!-- 6 Cost -->
 <section>
   <h2>Cost (measured, not estimated)</h2>
   <div class="grid3">
-    <div class="stat"><div class="big">$0.0018</div><p>average per question<br>(9 runs, 9 AI calls avg)</p></div>
-    <div class="stat"><div class="big">22 s</div><p>average to a full team answer</p></div>
-    <div class="stat"><div class="big">$183</div><p>per month for 10,000 users<br>($1.83 for 100) at 10 questions each</p></div>
+    <div class="stat"><div class="big">$0.0020</div><p>average per question<br>(9 runs, 9.3 AI calls avg)</p></div>
+    <div class="stat"><div class="big">27 s</div><p>average to a full team answer</p></div>
+    <div class="stat"><div class="big">$350</div><p>per month for 10,000 users<br>($3.50 for 100): 10 questions + a daily update each</p></div>
   </div>
   <table style="margin-top:.6em">
     <tr><th>Cost-cutting step</th><th>Measured effect</th></tr>
     <tr><td>Reasoning off for tools + max 2 searches per specialist</td><td>Same question: <b>$0.0046 → $0.0019 (−59%)</b>, 43 s → 24 s</td></tr>
-    <tr><td>Prompt caching</td><td>39% of input tokens cached → 21% saved</td></tr>
+    <tr><td>Prompt caching</td><td>45% of input tokens cached → about 24% saved</td></tr>
     <tr><td>Answer in code when no AI is needed</td><td>Crisis and blocked requests: 0 calls, $0</td></tr>
+    <tr><td>Measured, not yet adopted: one agent instead of the team</td><td>$0.0020 → $0.0005 with equal or better blind scores</td></tr>
   </table>
-  <p class="muted">A live spend meter on the round table ticks up as each call is billed, with a hard $0.01 cap per question. The Captain is 36% of spend. One lawyer-hour ($349) buys about 190,000 questions.</p>
+  <p class="muted">A live spend meter on the round table ticks up as each call is billed, with a hard $0.01 cap per question. The Captain is 37% of spend. One lawyer-hour ($349) buys about 175,000 questions.</p>
 </section>
 
 <!-- 7 Safety -->
 <section>
   <h2>Safety: defenses in code, tested with traps</h2>
   <div class="grid2">
-    <div><img src="{{IMG:05_hidden_text_removed.jpg}}" alt="Hidden text removed"><p class="muted">A lease with white "$2,000 cleaning fee by wire" text and 1.5-pt text: removed and shown to the family. The AI never sees it.</p></div>
+    <div><img src="{{IMG:15_hidden_text_removed-2.jpg}}" alt="Hidden text removed"><p class="muted">A lease with white "$2,000 cleaning fee by wire" text and 1.5-pt text: removed and shown to the family. The AI never sees it.</p></div>
     <div>
       <table>
         <tr><th>Live red-team attack</th><th>Result</th></tr>
@@ -153,7 +154,7 @@
         <tr><td>Scam address planted for Ari's email</td><td class="ok">stopped</td></tr>
         <tr><td>Normal question: no false alarms</td><td class="ok">passed</td></tr>
       </table>
-      <p class="muted"><b>9 / 9</b> live + 31 offline tests. The red team caught a real leak (a tool passing removed hidden text to the AI) and an audit false alarm. Both fixed and re-tested.</p>
+      <p class="muted"><b>9 / 9</b> live + 46 offline tests. The red team caught a real leak (a tool passing removed hidden text to the AI) and an audit false alarm. Both fixed and re-tested.</p>
     </div>
   </div>
 </section>
@@ -167,8 +168,8 @@
     <div class="stat"><div class="big">6</div><p>languages, with the full answer in the family's language</p></div>
   </div>
   <ul style="font-size:.6em;margin-top:.7em">
-    <li>The huddle surfaced details no one asked about: both spouses must be named on a renters policy; using all savings for a down payment would erase a 4-month cushion.</li>
-    <li>A question that would cost a $349/hour professional costs <b>$0.0018</b> and 20 seconds, with sources and shown math.</li>
+    <li><b>Blind test</b> (27 answers, 2 rounds): tools + guards avoided the plain model's errors (2025 tax tables, hidden PDF text). But <b>one agent with the same tools outscored the team</b> at ¼ of the cost.</li>
+    <li>A question that would cost a $349/hour professional costs <b>$0.0020</b> and about 30 seconds, with sources and shown math.</li>
     <li><b>Two real users</b> (Spanish; buying a home, opening a bookstore): <b>both 5/5 useful, 5/5 trust</b>, both would use it for a real decision. "Es una app estupenda para materializar las ideas de negocios." Both asked for more depth; backup calls cut the wait from 102 s to 41 s.</li>
   </ul>
 </section>
@@ -178,6 +179,7 @@
   <h2>Limits</h2>
   <ul style="font-size:.7em">
     <li>Two real users so far; both want more depth; answers can still take ~40 s when the provider is busy</li>
+    <li>The team view costs ~4× one agent with no quality gain (blind test)</li>
     <li>Federal taxes only (single and married-joint); no state tax, credits or head-of-household</li>
     <li>General information, not licensed advice; the team can still be wrong</li>
     <li>Pattern-based guards can miss paraphrased injections; the hidden-text check assumes a light page</li>
@@ -193,7 +195,7 @@
     <li><b>Beta with 5–10 families</b> through a housing nonprofit or VITA site: time to a usable answer, comprehension, to-dos acted on</li>
     <li><b>State packs</b>: Connecticut and Florida tax, tenant law and benefits rules as data</li>
     <li><b>Warm handoffs</b>: a printable summary for legal aid, VITA or a HUD counselor</li>
-    <li><b>Read Me First inside</b>: Ava decodes court papers and deadlines</li>
+    <li><b>Route by need</b>: one agent with the same tools for most questions (¼ the cost, better blind scores); the round table as an opt-in view</li>
     <li><b>Ari's connections</b>: Gmail and Outlook sign-in (drafts into your inbox, never sent); your own Claude after the professor's OK</li>
     <li><b>Stronger guards and hosting</b>: injection classifier, rendered-page check, encryption at rest</li>
   </ul>
