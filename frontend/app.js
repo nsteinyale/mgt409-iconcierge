@@ -335,6 +335,7 @@ async function showApp() {
   </div>`;
   $(".lang-select").onchange = async e => {
     setLang(e.target.value);
+    beta("language", { language: LANG });
     state.me = await api("/api/me", { method: "PUT", body: { settings: { language: LANG } } });
     showApp();
   };
@@ -347,6 +348,7 @@ async function showApp() {
   $("#send").onclick = send;
   $("#level").onchange = async e => {
     state.me = await api("/api/me", { method: "PUT", body: { settings: { explain_level: e.target.value } } }).catch(() => state.me);
+    beta("level", { level: e.target.value });
     if (state.daily?.key !== dailyKey()) loadDaily();
   };
   $("#attach-btn").onclick = () => { state.tab = "docs"; $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "docs")); renderSide(); };
@@ -436,6 +438,7 @@ async function loadChat() {
     <div class="topic-prompts" aria-live="polite"></div>
     <p class="stats">${esc(t("welcome_hint"))}</p></div>`));
   $$("[data-topic]", chat).forEach(b => b.onclick = () => {
+    beta("topic", { topic: b.dataset.topic });
     $$("[data-topic]", chat).forEach(x => x.classList.toggle("on", x === b));
     const box = $(".topic-prompts", chat);
     box.innerHTML = [1, 2].map(i => `<button type="button" class="topic-prompt">${esc(t(`p_${b.dataset.topic}_${i}`))}</button>`).join("");
@@ -508,7 +511,7 @@ async function send() {
         const ev = JSON.parse(line);
         if (ev.type === "plan" && ev.ack) $(".bubble", pending).innerHTML = `<em>${esc(ev.ack)}</em>`;
         if (ev.type === "captain_summary") summary = ev;
-        if (ev.type === "done") totals = ev.totals;
+        if (ev.type === "done") { totals = ev.totals; state.lastRunId = ev.run_id; }
         state.lastEvents.push(ev);
         onEvent(ev);
       }
@@ -528,8 +531,10 @@ async function send() {
       <ul>${checks.map(c => `<li class="st-${c.status}">${c.status === "ok" ? "✓" : c.status === "caught" ? "🛡️" : "⚠️"} ${esc(t("c_" + c.check))} · ${esc(t("st_" + c.status))}</li>`).join("")}</ul></details>` : "";
     const stats = (totals ? `<div class="stats">${esc(t("stats", { calls: totals.calls, cost: totals.cost.toFixed(4), seconds: Math.round(totals.seconds) }))}</div>` : "") + shield;
     chat.insertAdjacentHTML("beforeend", captainBubble(renderMarkdown(summary.answer, summary.sources) + sources +
-      (todos ? `<div class="todo-chips"><strong>${esc(t("todos_added"))}</strong>${todos}</div>` : "") + draftChip + stats));
+      (todos ? `<div class="todo-chips"><strong>${esc(t("todos_added"))}</strong>${todos}</div>` : "") + draftChip + stats +
+      (state.me?.guest ? feedbackHTML(state.lastRunId) : "")));
     const last = chat.lastElementChild;
+    wireFeedback($(".beta-fb", last));
     $(".open-drafts", last)?.addEventListener("click", e => { e.preventDefault(); switchTab("drafts"); });
     $(".avatar", last).classList.add("is-talking");
     setTimeout(() => $(".avatar", last)?.classList.remove("is-talking"), 2400);
@@ -556,8 +561,40 @@ function talk(id, ms = 1600) {
   if (RoundTable.ready) RoundTable.talk(id, ms);
 }
 
+// Guest / Beta mode: record clicks and ratings on this computer so real-user tests need no paperwork.
+function beta(kind, data = {}) {
+  if (!state.me?.guest) return;
+  fetch("/api/beta", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind, data }) }).catch(() => {});
+}
+
+function feedbackHTML(runId) {
+  return `<div class="beta-fb" data-run="${Number(runId) || 0}">
+    <div class="fb-q">🎟️ ${esc(t("fb_q"))}</div>
+    <div class="fb-stars">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-rate="${n}" aria-label="${n}">★</button>`).join("")}</div>
+    <textarea maxlength="1000" placeholder="${esc(t("fb_comment_ph"))}"></textarea>
+    <label class="fb-ok"><input type="checkbox"> ${esc(t("fb_quote_ok"))}</label>
+    <button type="button" class="btn small gold fb-send" disabled>${esc(t("fb_send"))}</button></div>`;
+}
+
+function wireFeedback(box) {
+  if (!box) return;
+  let rating = 0;
+  $$("[data-rate]", box).forEach(b => b.onclick = () => {
+    rating = Number(b.dataset.rate);
+    $$("[data-rate]", box).forEach(x => x.classList.toggle("on", Number(x.dataset.rate) <= rating));
+    $(".fb-send", box).disabled = false;
+  });
+  $(".fb-send", box).onclick = () => {
+    beta("feedback", { run_id: Number(box.dataset.run) || null, rating, comment: $("textarea", box).value.trim(),
+                       quote_ok: $("input", box).checked });
+    box.innerHTML = `<div class="fb-thanks">✓ ${esc(t("fb_thanks"))}</div>`;
+  };
+}
+
 function switchTab(tab) {
   state.tab = tab;
+  beta("tab", { tab });
   $$(".side-tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === tab));
   renderSide();
 }
@@ -793,6 +830,7 @@ function renderSide() {
     $("#daily-retry")?.addEventListener("click", loadDaily);
     $$("[data-daily-ask]").forEach(b => b.onclick = () => {
       const tip = state.daily.tips[Number(b.dataset.dailyAsk)];
+      beta("daily_ask", { member: tip.member });
       const ask = $("#ask");
       ask.value = t("daily_ask_q", { name: personName(tip.member), title: tip.title });   // the family can edit before sending
       ask.dispatchEvent(new Event("input"));
@@ -874,6 +912,7 @@ function renderSide() {
       $$("[data-act]", card).forEach(b => b.onclick = async () => {
         const d = read(), enc = encodeURIComponent, to = isEmail(d.to) ? d.to.trim() : "";
         const act = b.dataset.act;
+        beta("draft_handoff", { act });
         if (act === "gmail") window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${enc(to)}&su=${enc(d.subject)}&body=${enc(d.body)}`, "_blank", "noopener");
         if (act === "outlook") window.open(`https://outlook.office.com/mail/deeplink/compose?to=${enc(to)}&subject=${enc(d.subject)}&body=${enc(d.body)}`, "_blank", "noopener");
         if (act === "mailto") location.href = `mailto:${enc(to)}?subject=${enc(d.subject)}&body=${enc(d.body)}`;
@@ -942,6 +981,7 @@ async function loadDocs() { state.docs = (await api("/api/documents").catch(() =
 
 async function uploadFile(e) {
   const file = e.target.files[0];
+  if (file) beta("upload", { type: file.type || "unknown" });
   const err = $("#doc-error");
   if (!file) return;
   if (file.size > 5 * 1024 * 1024) return err.textContent = t("err_too_big");

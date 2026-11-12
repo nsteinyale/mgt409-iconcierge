@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iConcierge · Real-user test sheet</title>
+<style>
+  :root { --navy: #14213d; --gold: #d9a441; --cream: #faf6ef; --line: #e7dcc6; --muted: #6b7280; --green: #2f855a; --red: #b83232; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.5 "Segoe UI", system-ui, sans-serif; background: var(--cream); color: #1f2937; }
+  header { background: var(--navy); color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header b { color: var(--gold); font-size: 1.4rem; }
+  header select, header button { font: inherit; }
+  main { max-width: 900px; margin: 0 auto; padding: 18px 20px 60px; }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+  h2 { margin: 0 0 8px; font-size: 1.05rem; color: var(--navy); }
+  h2 .step { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: var(--navy); margin-right: 8px; font-size: .9rem; }
+  .say { background: #fff8ea; border-left: 4px solid var(--gold); padding: 8px 12px; border-radius: 8px; margin: 8px 0; }
+  .say::before { content: "Say: "; font-weight: 700; color: #8a6116; }
+  label { display: block; font-weight: 600; margin: 10px 0 4px; }
+  input[type=text], textarea, select { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid #d6cdbb; border-radius: 8px; background: #fff; }
+  textarea { min-height: 62px; resize: vertical; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .inline { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-weight: 400; }
+  .inline label { display: inline-flex; gap: 6px; align-items: center; font-weight: 400; margin: 0; }
+  .timer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0; }
+  .clock { font: 700 2.2rem/1 ui-monospace, Consolas, monospace; color: var(--navy); min-width: 6ch; }
+  .clock.over { color: var(--red); }
+  button { font: 600 14px "Segoe UI", system-ui, sans-serif; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--navy); background: #fff; color: var(--navy); cursor: pointer; }
+  button.go { background: var(--green); border-color: var(--green); color: #fff; }
+  button.stop { background: var(--red); border-color: var(--red); color: #fff; }
+  button.gold { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .scale { display: flex; gap: 6px; }
+  .scale input { display: none; }
+  .scale span { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #d6cdbb; cursor: pointer; }
+  .scale input:checked + span { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .muted { color: var(--muted); font-size: .88rem; }
+  .saved { color: var(--green); font-size: .85rem; }
+  a { color: var(--navy); }
+  @media print { header button, header select, .timer button, #actions { display: none; } section { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <b>iConcierge</b><span>Real-user test sheet</span>
+  <label class="inline" style="margin:0;font-weight:600">Tester
+    <select id="tester" style="width:auto"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+  <span class="saved" id="saved"></span>
+  <span style="flex:1"></span>
+  <button class="gold" id="download">⬇ Save results (.txt)</button>
+  <button id="clear">Clear this tester</button>
+</header>
+<main>
+  <p class="muted">About 15 minutes. Everything you type is saved in this browser as you go (one sheet per tester). At the end,
+    click <b>Save results</b>; it downloads <code>iconcierge_tester_N.txt</code>. Give that file to Claude.</p>
+
+  <section>
+    <h2><span class="step">1</span>Before you start</h2>
+    <div class="say">This is a class prototype. It gives general information, not legal, tax or investment advice. Please don't type
+      real Social Security, account or card numbers; ranges and made-up numbers are fine.</div>
+    <div class="say">May I quote you in my class report, by first name or anonymously?</div>
+    <div class="row">
+      <div><label for="name">Name to use in the report</label><input type="text" id="name" placeholder="First name, or leave blank for anonymous"></div>
+      <div><label>Permission to quote</label>
+        <div class="inline"><label><input type="radio" name="permission" value="first name">Yes, first name</label>
+          <label><input type="radio" name="permission" value="anonymous">Anonymous only</label>
+          <label><input type="radio" name="permission" value="no">No quotes</label></div></div>
+    </div>
+    <label for="who">Who they are (no names), e.g. "renter, 30s, side business"</label><input type="text" id="who">
+  </section>
+
+  <section>
+    <h2><span class="step">2</span>Their question</h2>
+    <div class="say">What's a real money, housing, tax, insurance or legal question on your mind right now?</div>
+    <label for="question">Question, in their words</label><textarea id="question"></textarea>
+    <div class="inline"><label><input type="radio" name="real" value="real">A real question of theirs</label>
+      <label><input type="radio" name="real" value="made up">Made up for the test</label></div>
+  </section>
+
+  <section>
+    <h2><span class="step">3</span>Before: without iConcierge (up to 5 minutes)</h2>
+    <div class="say">Use Google, ChatGPT or anything you normally would. Tell me when you have an answer you'd act on.</div>
+    <div class="timer"><span class="clock" id="c-before">0:00</span>
+      <button class="go" data-start="before">Start</button><button class="stop" data-stop="before">Stop</button><button data-reset="before">Reset</button>
+      <span class="muted">Stops by itself at 5:00.</span></div>
+    <label>Did they reach an answer they'd act on?</label>
+    <div class="inline"><label><input type="radio" name="before_answer" value="yes">Yes</label><label><input type="radio" name="before_answer" value="no, gave up / time ran out">No, gave up or time ran out</label></div>
+    <label for="before_tool">What they used</label><input type="text" id="before_tool" placeholder="Google, ChatGPT, a friend…">
+    <label>How confident were they in that answer? (1 = not at all, 5 = very)</label><div class="scale" data-scale="before_conf"></div>
+    <label for="before_notes">What they found (one line)</label><input type="text" id="before_notes">
+  </section>
+
+  <section>
+    <h2><span class="step">4</span>After: the same question in iConcierge</h2>
+    <p class="muted">Open <a href="http://localhost:8765" target="_blank">http://localhost:8765</a> → click <b>🎟️ Guest / Beta mode</b>.
+      Let them look around for a moment (the Daily Update opens first), then they type the same question.</p>
+    <div class="say">Ask the same question here. I'll time from when you press Send until you've finished reading the answer.</div>
+    <div class="timer"><span class="clock" id="c-after">0:00</span>
+      <button class="go" data-start="after">Start (they press Send)</button><button class="stop" data-stop="after">Stop (done reading)</button><button data-reset="after">Reset</button></div>
+    <label>How confident are they in this answer? (1–5)</label><div class="scale" data-scale="after_conf"></div>
+    <label>Did they use anything else? (tick all)</label>
+    <div class="inline"><label><input type="checkbox" name="used" value="Ari's draft email">Ari's draft email</label>
+      <label><input type="checkbox" name="used" value="a to-do">A to-do</label>
+      <label><input type="checkbox" name="used" value="a source link">A source link</label>
+      <label><input type="checkbox" name="used" value="the Daily Update">The Daily Update</label>
+      <label><input type="checkbox" name="used" value="explanation level">Explanation level</label>
+      <label><input type="checkbox" name="used" value="another language">Another language</label>
+      <label><input type="checkbox" name="used" value="uploaded a document">Uploaded a document</label></div>
+    <label for="watched">Anything you noticed while they used it (where they paused, smiled, got stuck)</label><textarea id="watched"></textarea>
+  </section>
+
+  <section>
+    <h2><span class="step">5</span>Three questions afterward</h2>
+    <label>1. "On a scale of 1–5, how useful was the answer?"</label><div class="scale" data-scale="useful"></div>
+    <label for="useful_why">…why?</label><textarea id="useful_why"></textarea>
+    <label for="confusing">2. "Was anything confusing or wrong?"</label><textarea id="confusing"></textarea>
+    <label for="trust">3. "Would you use this for a real decision? What would make you trust it more?"</label><textarea id="trust"></textarea>
+    <label for="quote">One sentence they said, word for word</label><textarea id="quote" placeholder="“…”"></textarea>
+  </section>
+
+  <section id="actions">
+    <h2><span class="step">6</span>Finish</h2>
+    <p>Click <b>⬇ Save results</b> at the top. Leave their guest space open (don't sign out) so Claude can pull the exact
+      question, answer, time and cost from the app's log. Then pick the next tester number at the top.</p>
+  </section>
+</main>
+<script>
+const FIELDS = ["name", "who", "question", "before_tool", "before_notes", "watched", "useful_why", "confusing", "trust", "quote"];
+const RADIOS = ["permission", "real", "before_answer", "before_conf", "after_conf", "useful"];
+const timers = { before: { ms: 0, t0: 0, cap: 5 * 60 * 1000 }, after: { ms: 0, t0: 0, cap: 0 } };
+const $ = s => document.querySelector(s);
+const key = () => "ic_tester_" + $("#tester").value;
+
+document.querySelectorAll("[data-scale]").forEach(box => {
+  box.className = "scale";
+  box.innerHTML = [1, 2, 3, 4, 5].map(n => `<label><input type="radio" name="${box.dataset.scale}" value="${n}"><span>${n}</span></label>`).join("");
+});
+
+function fmt(ms) { const s = Math.floor(ms / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
+function elapsed(id) { const t = timers[id]; return t.ms + (t.t0 ? Date.now() - t.t0 : 0); }
+function tick() {
+  for (const id of ["before", "after"]) {
+    const t = timers[id];
+    if (t.t0 && t.cap && elapsed(id) >= t.cap) { t.ms = t.cap; t.t0 = 0; save(); }
+    const el = $("#c-" + id);
+    el.textContent = fmt(elapsed(id));
+    el.classList.toggle("over", !!t.cap && elapsed(id) >= t.cap);
+  }
+  requestAnimationFrame(tick);
+}
+document.querySelectorAll("[data-start]").forEach(b => b.onclick = () => { const t = timers[b.dataset.start]; if (!t.t0) t.t0 = Date.now(); save(); });
+document.querySelectorAll("[data-stop]").forEach(b => b.onclick = () => { const t = timers[b.dataset.stop]; if (t.t0) { t.ms += Date.now() - t.t0; t.t0 = 0; } save(); });
+document.querySelectorAll("[data-reset]").forEach(b => b.onclick = () => { timers[b.dataset.reset] = { ...timers[b.dataset.reset], ms: 0, t0: 0 }; save(); });
+
+function collect() {
+  const d = { tester: $("#tester").value, saved_at: new Date().toISOString(), before_ms: elapsed("before"), after_ms: elapsed("after"),
+              before_running: timers.before.t0, after_running: timers.after.t0, before_base: timers.before.ms, after_base: timers.after.ms };
+  FIELDS.forEach(f => d[f] = $("#" + f).value);
+  RADIOS.forEach(r => d[r] = (document.querySelector(`input[name="${r}"]:checked`) || {}).value || "");
+  d.used = [...document.querySelectorAll('input[name="used"]:checked')].map(c => c.value);
+  return d;
+}
+function save() {
+  localStorage.setItem(key(), JSON.stringify(collect()));
+  $("#saved").textContent = "Saved ✓ " + new Date().toLocaleTimeString();
+}
+function load() {
+  const d = JSON.parse(localStorage.getItem(key()) || "{}");
+  FIELDS.forEach(f => $("#" + f).value = d[f] || "");
+  RADIOS.forEach(r => document.querySelectorAll(`input[name="${r}"]`).forEach(i => i.checked = i.value === d[r]));
+  document.querySelectorAll('input[name="used"]').forEach(c => c.checked = (d.used || []).includes(c.value));
+  timers.before.ms = d.before_base || 0; timers.before.t0 = d.before_running || 0;
+  timers.after.ms = d.after_base || 0; timers.after.t0 = d.after_running || 0;
+  $("#saved").textContent = d.saved_at ? "Loaded tester " + $("#tester").value : "";
+}
+document.addEventListener("input", e => { if (e.target.id !== "tester") save(); });
+$("#tester").onchange = load;
+$("#clear").onclick = () => { if (confirm("Clear everything for tester " + $("#tester").value + "?")) { localStorage.removeItem(key()); load(); } };
+$("#download").onclick = () => {
+  save();
+  const d = collect();
+  const txt = [
+    `iConcierge real-user test · tester ${d.tester} · saved ${d.saved_at}`,
+    `Name for report: ${d.name || "(anonymous)"} · permission to quote: ${d.permission || "(not asked)"}`,
+    `Who: ${d.who}`, ``,
+    `Question (${d.real || "?"}): ${d.question}`, ``,
+    `BEFORE (no iConcierge): ${fmt(d.before_ms)} · answer they'd act on: ${d.before_answer || "?"} · confidence ${d.before_conf || "?"}/5`,
+    `  used: ${d.before_tool}`, `  found: ${d.before_notes}`, ``,
+    `AFTER (iConcierge): ${fmt(d.after_ms)} from Send to done reading · confidence ${d.after_conf || "?"}/5`,
+    `  also used: ${d.used.join(", ") || "nothing else"}`, `  observed: ${d.watched}`, ``,
+    `Usefulness: ${d.useful || "?"}/5 · why: ${d.useful_why}`,
+    `Confusing or wrong: ${d.confusing}`,
+    `Real decision / trust: ${d.trust}`,
+    `Quote: ${d.quote}`, ``,
+    `RAW: ${JSON.stringify(d)}`,
+  ].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain" }));
+  a.download = `iconcierge_tester_${d.tester}.txt`;
+  a.click();
+};
+load();
+tick();
+</script>
+</body>
+</html>

@@ -44,6 +44,7 @@ MAX_COST_PER_QUESTION = 0.01   # dollars; the team stops if one question would c
 SESSION_COOKIE = "ic_session"
 SESSION_DAYS = 14
 MAX_GUESTS_PER_HOUR = 10          # Guest / Beta mode sign-ins per address per hour
+MAX_BETA_EVENTS_PER_HOUR = 300    # beta clicks and ratings a guest can log per hour
 
 LANGUAGES = {
     "en": "English",

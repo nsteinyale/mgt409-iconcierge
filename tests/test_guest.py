@@ -46,6 +46,29 @@ class GuestMode(unittest.TestCase):
         db.purge_guests(time.time() + 1)                                  # pretend a week has passed
         self.assertIsNone(db.family_by_id(fid))
 
+    def test_beta_log_records_guests_only(self):
+        guest, member = TestClient(main.app), TestClient(main.app)
+        g = guest.post("/api/guest", json={}).json()
+        member.post("/api/signup", json={"handle": f"beta-member-{time.time_ns() % 10**8}", "passcode": "secret123"})
+        since = time.time() - 1
+        ok = guest.post("/api/beta", json={"kind": "feedback", "data": {"run_id": 7, "rating": 5,
+                                                                      "comment": "Great. Card 4111 1111 1111 1111", "quote_ok": True}}).json()
+        self.assertTrue(ok["ok"])
+        self.assertFalse(guest.post("/api/beta", json={"kind": "anything", "data": {}}).json()["ok"])   # unknown kinds ignored
+        self.assertFalse(member.post("/api/beta", json={"kind": "tab", "data": {"tab": "docs"}}).json()["ok"])  # accounts are not tracked
+        logged = [r for r in db.list_beta(since) if r["kind"] == "feedback" and r["family_id"] == g["id"]]
+        self.assertEqual(len(logged), 1)
+        self.assertNotIn("4111", logged[0]["data"]["comment"])                   # private numbers masked
+        self.assertEqual(logged[0]["run_id"], 7)
+
+    def test_beta_log_survives_guest_purge(self):
+        c = TestClient(main.app)
+        g = c.post("/api/guest", json={}).json()
+        c.post("/api/beta", json={"kind": "tab", "data": {"tab": "daily"}})
+        db.purge_guests(time.time() + 1)
+        self.assertIsNone(db.family_by_id(g["id"]))
+        self.assertTrue(any(r["family_id"] == g["id"] for r in db.list_beta()))
+
 
 if __name__ == "__main__":
     unittest.main()

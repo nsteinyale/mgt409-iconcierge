@@ -119,6 +119,7 @@ def guest(body: Guest, request: Request, response: Response):
     settings = clean_settings({"language": body.language, "help_mode": "family", "captain_style": "warm",
                                "captain_avatar": "captain_b", "captain_name": "Rosa", "explain_level": "beginner"})
     family_id = auth.sign_up_guest(settings)
+    db.log_beta(family_id, db.family_by_id(family_id)["handle"], "session_start", {"language": settings["language"]})
     set_session_cookie(response, family_id)
     return family_dict(db.family_by_id(family_id))
 
@@ -195,11 +196,57 @@ async def ask(body: Ask, family: dict = Depends(current_family)):
     doc_ids = [d for d in body.document_ids if d in owned]
 
     async def stream():
+        seen: dict[str, Any] = {"specialists": []}
+        started = time.time()
         async for event in team.run_question(family, body.question, doc_ids):
+            if family["guest"]:
+                kind = event.get("type")
+                if kind == "run_started":
+                    seen["run_id"] = event.get("run_id")
+                elif kind == "assign":
+                    seen["specialists"].append(event.get("to"))
+                elif kind in ("captain_summary", "safety_summary", "done"):
+                    seen[kind] = event
             yield json.dumps(event, ensure_ascii=False) + "\n"
+        if family["guest"] and seen.get("run_id"):
+            run = db.get_run(family["id"], seen["run_id"]) or {}
+            summary, done = seen.get("captain_summary") or {}, seen.get("done") or {}
+            db.log_beta(family["id"], family["handle"], "run", {
+                "question": run.get("question", ""), "answer": summary.get("answer", ""),
+                "specialists": seen["specialists"], "sources": [s.get("id") for s in summary.get("sources") or []],
+                "todos": len(summary.get("todos") or []), "documents": len(doc_ids),
+                "checks": (seen.get("safety_summary") or {}).get("checks", []), "totals": done.get("totals", {}),
+                "wall_seconds": round(time.time() - started, 1), "language": family["settings"].get("language"),
+                "level": family["settings"].get("explain_level")}, seen["run_id"])
 
     return StreamingResponse(stream(), media_type="application/x-ndjson",
                              headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
+
+
+BETA_KINDS = {"tab", "feedback", "daily_ask", "draft_handoff", "level", "language", "upload", "topic"}
+
+
+class BetaEvent(BaseModel):
+    kind: str
+    data: dict = Field(default_factory=dict)
+
+
+@app.post("/api/beta")
+def beta_event(body: BetaEvent, family: dict = Depends(current_family)):
+    """Guest / Beta mode only: record what testers click and how they rate answers (stays on this computer)."""
+    if not family["guest"] or body.kind not in BETA_KINDS:
+        return {"ok": False}
+    if db.count_beta_since(family["id"], 3600) >= config.MAX_BETA_EVENTS_PER_HOUR:
+        raise HTTPException(status_code=429, detail="rate_limited")
+    data: dict[str, Any] = {}
+    for k, v in list(body.data.items())[:8]:
+        if isinstance(v, (int, float, bool)) or v is None:
+            data[str(k)[:30]] = v
+        else:
+            data[str(k)[:30]] = safety.redact_private(str(v)[:1000])[0]      # no private numbers in the log
+    run_id = data.get("run_id") if isinstance(data.get("run_id"), int) else None
+    db.log_beta(family["id"], family["handle"], body.kind, data, run_id)
+    return {"ok": True}
 
 
 @app.get("/api/daily")

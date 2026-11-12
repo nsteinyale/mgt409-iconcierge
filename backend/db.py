@@ -63,6 +63,15 @@ CREATE TABLE IF NOT EXISTS documents (
     text TEXT NOT NULL,
     created_at REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS beta_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    family_id INTEGER NOT NULL,
+    handle TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    run_id INTEGER,
+    data_json TEXT NOT NULL,
+    created_at REAL NOT NULL
+);
 CREATE TABLE IF NOT EXISTS daily_updates (
     family_id INTEGER NOT NULL REFERENCES families(id) ON DELETE CASCADE,
     day TEXT NOT NULL,
@@ -340,6 +349,26 @@ def delete_document(family_id: int, doc_id: int) -> bool:
     with connect() as conn:
         cur = conn.execute("DELETE FROM documents WHERE id = ? AND family_id = ?", (doc_id, family_id))
         return cur.rowcount > 0
+
+
+# --- Guest / Beta test log (kept after guest spaces are purged) ---------------------------
+
+def log_beta(family_id: int, handle: str, kind: str, data: dict, run_id: int | None = None) -> None:
+    with connect() as conn:
+        conn.execute("INSERT INTO beta_log (family_id, handle, kind, run_id, data_json, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                     (family_id, handle, kind, run_id, json.dumps(data, ensure_ascii=False), time.time()))
+
+
+def count_beta_since(family_id: int, seconds: float) -> int:
+    with connect() as conn:
+        return conn.execute("SELECT COUNT(*) FROM beta_log WHERE family_id = ? AND created_at > ?",
+                            (family_id, time.time() - seconds)).fetchone()[0]
+
+
+def list_beta(since: float = 0) -> list[dict]:
+    with connect() as conn:
+        rows = conn.execute("SELECT * FROM beta_log WHERE created_at >= ? ORDER BY id", (since,)).fetchall()
+    return [{**dict(r), "data": json.loads(r["data_json"])} for r in rows]
 
 
 # --- daily update cache ----------------------------------------------------------------
