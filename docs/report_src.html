@@ -65,7 +65,7 @@
   <div><b>Code:</b> <a href="https://github.com/nsteinyale/mgt409-iconcierge">github.com/nsteinyale/mgt409-iconcierge</a> (private; access shared with the teaching staff)</div>
   <div><b>Run it:</b> <code>pip install -r requirements.txt</code>, put <code>PORTKEY_API_KEY</code> in <code>.env</code> (repo folder or one above), then <code>python run.py</code> → http://127.0.0.1:8765. Full steps in the README.</div>
   <div><b>Model:</b> <code>gpt-6-luna</code> through the course Portkey key · <b>Slides:</b> <code>slides.html</code> · <b>Measured on:</b> November 7–8, 2026</div>
-  <div><b>Dry run (Nov 8):</b> fresh clone into a new folder, <code>.env</code> one folder up, README steps only → installed in 4 min 13 s, first answer 17 s later, all tests passing.</div>
+  <div><b>Dry run (Nov 12):</b> fresh clone into a new folder, <code>.env</code> one folder up, README steps only → installed in 2 min 3 s, first answer 28 s later, all 45 tests passing.</div>
 </div>
 
 <div class="kpis">
@@ -283,7 +283,7 @@
   <tr><td>Time to a complete, sourced answer from a team of up to 3 specialists</td><td class="num"><b>22 s average</b> (12.5–29.8 s)</td><td>Measured, 9 runs</td></tr>
   <tr><td>Cost per answer</td><td class="num"><b>$0.0018 average</b></td><td>Measured, 9 runs</td></tr>
   <tr><td>Tax calculator accuracy against the IRS's 2026 brackets</td><td>Exact on every test case (e.g. $45,000 single → $3,220; $120,000 joint → $10,040; $50,000 self-employment profit → $7,064.78)</td><td>Unit tests; <a href="https://www.irs.gov/newsroom/irs-releases-tax-inflation-adjustments-for-tax-year-2026-including-amendments-from-the-one-big-beautiful-bill">IRS Rev. Proc. 2025-32</a></td></tr>
-  <tr><td>Attacks stopped / false alarms on a normal question</td><td>9 of 9 / none (after the fix above)</td><td>Live red team</td></tr>
+  <tr><td>Attacks stopped / false alarms on a normal question</td><td>9 of 9 / none (after the fix above; re-run Nov 12: 9 of 9)</td><td>Live red team</td></tr>
   <tr><td>Official source links that opened when checked</td><td>34 of 42 opened; the other 8 are official sites that block automated checks (CFPB, SSA, Medicaid, NAIC)</td><td>Link checks, Nov 7–8, 2026</td></tr>
 </table>
 <p><b>What the team caught that a single answer might not.</b> In run 3 the huddle tied the down-payment question to the emergency fund ("$12,000 is four months… using it all would eliminate that cushion"), and Leo flagged that the saved profile conflicted with the message instead of silently picking one. In run 7 Grace and Marcus agreed that both spouses must be named insureds on the renters policy, a detail neither question asked about.</p>

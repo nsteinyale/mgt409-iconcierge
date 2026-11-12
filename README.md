@@ -62,8 +62,8 @@ Your browser opens http://127.0.0.1:8765. To look around fast, click **🎟️ G
 private guest space in this browser (Captain Rosa, default settings), limited to 10 new guests per address per hour
 and removed after 7 days. Or click **Create a family account**, finish the 3 setup steps, then pick
 a topic under **"What do you want help with?"** (starting a company, planning a move, investing, taxes, buying a
-home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 8, 2026
-took 4 min 13 s to install and answered its first question 17 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
+home, debt, insurance, legal letters) and send one of its example questions. A fresh-clone dry run on Nov 12, 2026
+took 2 min 3 s to install (45 tests passing) and answered its first question 28 s later. (Set `ICONCIERGE_NO_BROWSER=1` to skip opening the browser.)
 
 Use the **🎓 Explanations** menu in the chat header to pick how answers are written: *Explain like I'm 5*, Beginner
 (default), Intermediate, Advanced or Professional. It is also in setup and the Profile tab.
