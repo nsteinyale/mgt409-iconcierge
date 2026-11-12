@@ -297,13 +297,13 @@
   <tr><td>Liked · to fix</td><td>The round table "makes the wait pleasant" · <b>the wait</b> (their one change), <b>more depth</b>, and Professional looked too like Beginner</td></tr>
 </table>
 <div class="callout">"Es una idea innovadora para recibir información acerca de temas legales de interés." <i>("It's an innovative idea for getting information on legal topics of interest.")</i> Tester 1, quoted anonymously.</div>
-<p><b>What I take from it.</b> Weeks of searching became minutes, and a first-time buyer trusted the answers. But one friendly tester is not a trial, and two answers took about 2.5 minutes, five times the 22 s in Section 5; team size doesn't explain it (the slowest used one specialist).</p>
+<p><b>What I take from it, and the fix.</b> Weeks of searching became minutes, and a first-time buyer trusted the answers, though one friendly tester is not a trial. The long waits came from provider lag on single calls (the same kind of call took 5 s or 55 s), so a call still waiting after 12 s is now sent again and the first reply wins. Re-asking their four questions twice: <b>average 102 → 41 s, slowest 166 → 72 s</b>, for $0.0018 of backup calls.</p>
 
 <!-- 8. Limits -->
 <h2 class="keep">8. Limits and next steps</h2>
 <h3>Limits</h3>
 <ul>
-  <li><b>One real user so far</b>, testing in my presence; their answers averaged 102 s (cause not yet found).</li>
+  <li><b>One real user so far</b>, testing in my presence. Answers can still take about 40 s when the provider is busy.</li>
   <li><b>Federal only.</b> The tax estimator covers 2026 federal brackets for single and married-joint filers; no state taxes, credits or head-of-household brackets. Specialists say so in their answers.</li>
   <li><b>General information, not licensed advice.</b> The team can be wrong or incomplete; the design leans on sources, shown math and "when to hire a professional," not on authority.</li>
   <li><b>Guards are pattern-based.</b> A paraphrased instruction can slip past the document flagger (the random markers and output guard still apply); the hidden-text check assumes a light page.</li>
@@ -312,7 +312,7 @@
 </ul>
 <h3>Next steps</h3>
 <ol>
-  <li><b>Fix the wait, then beta test with 5–10 families</b> (e.g., through a New Haven housing nonprofit or VITA site); Guest / Beta mode already logs each run and a 1–5 rating per answer.</li>
+  <li><b>Beta test with 5–10 families</b> (e.g., through a New Haven housing nonprofit or VITA site); Guest / Beta mode already logs each run and a 1–5 rating per answer. Show the answer as it is written, so waits feel shorter.</li>
   <li><b>State packs</b>: state income tax, tenant law and benefits rules as data files, starting with Connecticut and Florida.</li>
   <li><b>Warm handoffs</b>: turn "when to hire a professional" into a printable summary for a legal-aid office, VITA volunteer or HUD counselor.</li>
   <li><b>Connections for Ari</b>: Gmail and Outlook through sign-in (OAuth), reading only emails the family picks and saving drafts to their inbox, never sending; the family's own Claude or ChatGPT only with the professor's OK on an extra key.</li>

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 from typing import Any
@@ -27,6 +28,55 @@ def client() -> AsyncOpenAI:
         key, base_url, headers = config.api_settings()
         _client = AsyncOpenAI(api_key=key, base_url=base_url, default_headers=headers, timeout=90, max_retries=2)
     return _client
+
+
+def _is_filtered(exc: BaseException) -> bool:
+    return isinstance(exc, BadRequestError) and ("content_filter" in str(exc) or "content management policy" in str(exc))
+
+
+async def _hedged(kwargs: dict) -> tuple[Any, int]:
+    """Send the request; if it hasn't answered after each HEDGE_AFTER_SECONDS mark, send an identical backup.
+
+    The first good reply wins and the others are cancelled. Returns (response, number of backups sent).
+    Provider latency has a long tail (the same call took 5 s or 55 s in the first real-user test), so a
+    backup request cuts the worst waits for a small, counted cost. Measured on the tester's four questions (x2):
+    average 102 s -> 41 s, slowest 166 s -> 72 s, 6 backups in 66 calls. Earlier marks (8 s) added cost without
+    saving time when the provider was slow overall.
+    """
+    tasks: list[asyncio.Task] = [asyncio.create_task(client().chat.completions.create(**kwargs))]
+    marks = list(config.HEDGE_AFTER_SECONDS)
+    started = time.perf_counter()
+    last_error: BaseException | None = None
+    try:
+        while True:
+            pending = [t for t in tasks if not t.done()]
+            timeout = None
+            if marks:
+                timeout = max(0.0, marks[0] - (time.perf_counter() - started))
+            if pending:
+                done, _ = await asyncio.wait(pending, timeout=timeout, return_when=asyncio.FIRST_COMPLETED)
+            else:
+                done = set()
+            for t in done:
+                exc = t.exception()
+                if exc is None:
+                    return t.result(), len(tasks) - 1
+                if _is_filtered(exc):
+                    raise exc                       # the provider will refuse every copy; stop now
+                last_error = exc
+            if marks and time.perf_counter() - started >= marks[0]:
+                marks.pop(0)
+                tasks.append(asyncio.create_task(client().chat.completions.create(**kwargs)))
+            elif not any(not t.done() for t in tasks):
+                if marks:                           # everything failed early: try once more right away
+                    marks.pop(0)
+                    tasks.append(asyncio.create_task(client().chat.completions.create(**kwargs)))
+                else:
+                    raise last_error or RuntimeError("no reply")
+    finally:
+        for t in tasks:
+            if not t.done():
+                t.cancel()
 
 
 def usage_of(response: Any, seconds: float) -> dict:
@@ -60,15 +110,23 @@ async def chat(messages: list[dict], *, agent: str, step: str, run_id: int | Non
         kwargs["response_format"] = {"type": "json_object"}
     started = time.perf_counter()
     try:
-        response = await client().chat.completions.create(**kwargs)
+        response, backups = await _hedged(kwargs)
     except BadRequestError as exc:
-        if "content_filter" in str(exc) or "content management policy" in str(exc):
+        if _is_filtered(exc):
             db.log_usage(run_id, family_id, agent, step, {"prompt_tokens": 0, "cached_tokens": 0,
                          "completion_tokens": 0, "cost": 0.0, "seconds": round(time.perf_counter() - started, 2)})
             raise ContentFiltered(str(exc)[:200]) from exc
         raise
     usage = usage_of(response, time.perf_counter() - started)
     db.log_usage(run_id, family_id, agent, step, usage)
+    if backups:
+        # Cancelled requests may still be billed. Count each at the winner's cost (an upper bound) so the
+        # spend meter and the budget cap stay honest.
+        extra = usage["cost"] * backups
+        db.log_usage(run_id, family_id, agent, f"{step} backup x{backups}", {"prompt_tokens": 0, "cached_tokens": 0,
+                     "completion_tokens": 0, "cost": extra, "seconds": 0.0})
+        usage["cost"] += extra
+    usage["backups"] = backups
     return response.choices[0].message, usage
 
 

@@ -40,6 +40,7 @@ PRICE_CACHED_IN = 0.01
 PRICE_CACHE_WRITE = 0.125
 PRICE_OUT = 0.50
 MAX_COST_PER_QUESTION = 0.01   # dollars; the team stops if one question would cost more (5x the worst run seen)
+HEDGE_AFTER_SECONDS = (12, 24)    # send a backup request if a call is still waiting at these marks
 
 SESSION_COOKIE = "ic_session"
 SESSION_DAYS = 14
