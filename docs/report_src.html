@@ -231,7 +231,7 @@
   <tr><td><b>Prompt caching</b> (stable system prompts first, growing tool history after)</td><td>39% of all input tokens were served from cache at one-tenth the price, saving $0.0043 of $0.0208 (21%) across the 9 runs.</td></tr>
   <tr><td><b>Answer in code when no AI is needed</b></td><td>Crisis messages: 0 calls, $0. Requests the provider's filter blocks: 0 billed calls. Harmful requests: 1 call ($0.0001) and no specialists.</td></tr>
   <tr><td><b>Hard limits</b>: 3 specialists, 4 tool rounds, small output caps (huddle 200 tokens, plan 900), and a <b>$0.01 spending cap per question</b> that stops the team and tells the family</td><td>Worst run seen: 18 calls, $0.0036, about a third of the cap. No runaway loops in any test.</td></tr>
-  <tr><td><b>Did any cut hurt performance?</b></td><td>Numbers: no. They come from calculators, identical before and after (unit tests). Safety: no; the red team scored 9/9 after the cuts (re-run Nov 12). Depth: possibly. Our real user asked for "more in-depth" answers, which the 2-search cap and short answer format may cause; the explanation level is the lever.</td></tr>
+  <tr><td><b>Did any cut hurt performance?</b></td><td>Numbers: no. They come from calculators, identical before and after (unit tests). Safety: no; the red team scored 9/9 after the cuts (re-run Nov 12). Depth: possibly. Both real users asked for more depth, which the 2-search cap and short answer format may cause; the explanation level is the lever.</td></tr>
   <tr><td><b>Only the specialists who are needed</b></td><td>Single-domain questions use 1 specialist and 4 calls ($0.0008–$0.0013), about half the cost of multi-domain ones.</td></tr>
 </table>
 
@@ -288,23 +288,23 @@
   <tr><td>Official source links that opened when checked</td><td>34 of 42 opened; the other 8 are official sites that block automated checks (CFPB, SSA, Medicaid, NAIC)</td><td>Link checks, Nov 7–8, 2026</td></tr>
 </table>
 <p><b>What the team caught that a single answer might not.</b> In run 3 the huddle tied the down-payment question to the emergency fund ("$12,000 is four months… using it all would eliminate that cushion"), and Leo flagged that the saved profile conflicted with the message instead of silently picking one. In run 7 Grace and Marcus agreed that both spouses must be named insureds on the renters policy, a detail neither question asked about.</p>
-<h3>First real user (November 12, 2026)</h3>
-<p>A Spanish speaker who is thinking of buying a home used <b>Guest / Beta mode in Spanish</b> on my laptop for 12 minutes and asked four real questions. The app logged each run; afterward I asked ten follow-up questions (answers translated).</p>
+<h3>Two real users (November 12, 2026)</h3>
+<p>Two Spanish speakers with real plans used <b>Guest / Beta mode in Spanish</b> on my laptop and asked their own questions. The app logged each run; afterward each answered ten follow-up questions (translated here).</p>
 <table>
-  <tr><th>Measure</th><th>Result</th></tr>
-  <tr><td>What they asked</td><td>Steps to buy a home in New York; buying a house to rent out; a business plan for that; mortgages in Florida, Connecticut and New York</td></tr>
-  <tr><td>Before → after</td><td>Google, for "a few more weeks" → <b>27–166 s per answer</b> (avg. 102 s), <b>$0.0083</b> for all four</td></tr>
-  <tr><td>Useful · trust · real decision?</td><td><b>5/5</b> ("they gave me a sense of what I needed to do") · <b>5/5</b> · <b>yes</b></td></tr>
-  <tr><td>Liked · to fix</td><td>The round table "makes the wait pleasant" · <b>the wait</b> (their one change), <b>more depth</b>, and Professional looked too like Beginner</td></tr>
+  <tr><th>Measure</th><th>Tester 1: buying a home</th><th>Tester 2: opening a bookstore</th></tr>
+  <tr><td>What they asked</td><td>Steps to buy in New York; buying to rent out; a business plan; mortgages in FL, CT and NY</td><td>A bookstore in Connecticut and Porto; the Captain first asked which country, what kind of store and where</td></tr>
+  <tr><td>Before → after</td><td>Google, "a few more weeks" → <b>27–166 s</b> per answer (avg. 102 s)</td><td>Google, "some more time" → <b>6–35 s</b> (avg. 16 s, after the fix below)</td></tr>
+  <tr><td>Useful · trust · real decision?</td><td><b>5/5</b> · <b>5/5</b> · <b>yes</b></td><td><b>5/5</b> ("very good and practical") · <b>5/5</b> · <b>yes</b></td></tr>
+  <tr><td>Liked · to fix</td><td>The round table "makes the wait pleasant" · <b>the wait</b>, <b>more depth</b>, Professional too like Beginner</td><td>The Captain's questions "helped me clarify the idea" · <b>longer answers</b>; switched to Beginner for speed</td></tr>
 </table>
-<div class="callout">"Es una idea innovadora para recibir información acerca de temas legales de interés." <i>("It's an innovative idea for getting information on legal topics of interest.")</i> Tester 1, quoted anonymously.</div>
-<p><b>What I take from it, and the fix.</b> Weeks of searching became minutes, and a first-time buyer trusted the answers, though one friendly tester is not a trial. The long waits came from provider lag on single calls (the same kind of call took 5 s or 55 s), so a call still waiting after 12 s is now sent again and the first reply wins. Re-asking their four questions twice: <b>average 102 → 41 s, slowest 166 → 72 s</b>, for $0.0018 of backup calls.</p>
+<div class="callout">"Es una idea innovadora para recibir información acerca de temas legales de interés." <i>("An innovative idea for getting information on legal topics of interest.")</i> Tester 1 · "Es una app estupenda para materializar las ideas de negocios." <i>("A great app for turning business ideas into reality.")</i> Tester 2. Both anonymous.</div>
+<p><b>What I take from it, and the fix.</b> Both rated it 5/5 and would use it for a real decision, but two friendly testers are not a trial. Tester 1's long waits came from provider lag on single calls (the same kind of call took 5 s or 55 s), so a call still waiting after 12 s is now sent again and the first reply wins: re-asking their questions, <b>average 102 → 41 s</b>; tester 2 then averaged 16 s. <b>Both asked for more depth</b>, the clearest lesson.</p>
 
 <!-- 8. Limits -->
 <h2 class="keep">8. Limits and next steps</h2>
 <h3>Limits</h3>
 <ul>
-  <li><b>One real user so far</b>, testing in my presence. Answers can still take about 40 s when the provider is busy.</li>
+  <li><b>Two real users so far</b>, testing in my presence. Answers can still take about 40 s when the provider is busy, and both found them too brief.</li>
   <li><b>Federal only.</b> The tax estimator covers 2026 federal brackets for single and married-joint filers; no state taxes, credits or head-of-household brackets. Specialists say so in their answers.</li>
   <li><b>General information, not licensed advice.</b> The team can be wrong or incomplete; the design leans on sources, shown math and "when to hire a professional," not on authority.</li>
   <li><b>Guards are pattern-based.</b> A paraphrased instruction can slip past the document flagger (the random markers and output guard still apply); the hidden-text check assumes a light page.</li>
@@ -314,12 +314,13 @@
 <h3>Next steps</h3>
 <ol>
   <li><b>Beta test with 5–10 families</b> (e.g., through a New Haven housing nonprofit or VITA site); Guest / Beta mode already logs each run and a 1–5 rating per answer. Show the answer as it is written, so waits feel shorter.</li>
-  <li><b>State packs</b>: state income tax, tenant law and benefits rules as data files, starting with Connecticut and Florida.</li>
-  <li><b>Warm handoffs</b>: turn "when to hire a professional" into a printable summary for a legal-aid office, VITA volunteer or HUD counselor.</li>
-  <li><b>Connections for Ari</b>: Gmail and Outlook through sign-in (OAuth), reading only emails the family picks and saving drafts to their inbox, never sending; the family's own Claude or ChatGPT only with the professor's OK on an extra key.</li>
+  <li><b>Deeper answers on request</b>: a "Tell me more" button (more searches, longer answer); the default stays cheap.</li>
+  <li><b>State packs</b>: state tax, tenant law and benefits rules as data files (Connecticut and Florida first).</li>
+  <li><b>Warm handoffs</b>: a printable summary for a legal-aid office, VITA volunteer or HUD counselor.</li>
+  <li><b>Connections for Ari</b>: Gmail and Outlook through sign-in (OAuth), saving drafts to the family's inbox, never sending.</li>
   <li><b>Stronger guards</b>: a classifier for paraphrased injections, rendered-page OCR checks for PDFs, and encryption at rest before hosting.</li>
 </ol>
-<p class="src">AI assistance: Claude helped build the app and draft this report; I directed the design, checked the numbers against the measured logs and am responsible for every claim. Figures were measured on November 7, 2026 unless dated or sourced; the real-user test was on November 12.</p>
+<p class="src">AI assistance: Claude helped build the app and draft this report; I directed the design, checked the numbers against the measured logs and am responsible for every claim. Figures were measured on November 7, 2026 unless dated or sourced; the real-user tests were on November 12.</p>
 </main>
 </body>
 </html>

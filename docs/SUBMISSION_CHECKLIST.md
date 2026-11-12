@@ -25,7 +25,7 @@ Submit on Canvas: the repo link, `report.html`, `slides.html` (and, optionally, 
 | Agent design (10) | Traced real run with screenshots | ✅ Run 3 traced step by step; round-table, answer and drafts screenshots |
 | Tokenomics (8) | Real token counts; cost per run, per user/month, at 100 and 10,000 users; cost cuts with evidence | ✅ 9 measured runs from the usage log; $1.83/month at 100 users, $183 at 10,000; −59% cost from reasoning-off + search cap; a "did any cut hurt performance?" row (numbers no, safety no, depth possibly, from the real user) |
 | Safety (8) | Screenshot or test of a defense working | ✅ Hidden-text and injection screenshots; 39 offline tests (Nov 10); live red team 9/9 (re-run Nov 12: 9/9) |
-| Impact + metrics (5) | A real user (quote, screenshot or before/after time) | ✅ Tester 1 (Nov 12, Spanish, Guest / Beta mode): quote, before/after ("a few more weeks" of Google vs. 27–166 s per answer), 5/5 useful, 5/5 trust; logged run data in `docs/user_tests/results/` (not committed) |
+| Impact + metrics (5) | A real user (quote, screenshot or before/after time) | ✅ Two real users (Nov 12, Spanish, Guest / Beta mode): quotes, before/after times, both 5/5 useful and 5/5 trust; logged runs and interviews in `docs/user_tests/results/` (not committed) |
 | Design (2) | Clean, readable, sharp screenshots | ✅ |
 
 ## Before submitting
