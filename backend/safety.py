@@ -352,6 +352,9 @@ def untraced_numbers(answer: str, known: set[float]) -> list[str]:
         tol = max(1.0, abs(value) * 0.006)
         if any(abs(value - k) <= tol or abs(value - k * 100) <= tol or abs(value * 100 - k) <= tol for k in known):
             continue
+        # a monthly or yearly version of a traced figure (e.g. "$5,260 a year, about $438 a month")
+        if any(abs(value - k / 12) <= tol or abs(value - k * 12) <= max(tol, 12) for k in known):
+            continue
         # a sum or difference of two known numbers (e.g. "$989 more than your rent") still traces to the tools
         if any(abs(value - abs(a - b)) <= tol or abs(value - (a + b)) <= tol for a in known for b in known if a != b):
             continue

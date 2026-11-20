@@ -126,6 +126,9 @@ class Audit(unittest.TestCase):
     def test_profile_income_range_counts_as_family_figures(self):
         known = safety.profile_numbers({"income_range": "75-100k", "state": "CT"})
         self.assertEqual(safety.untraced_numbers("Your income range is $75,000 to $100,000.", known), [])
+        # a monthly version of a calculator figure traces; an unrelated figure still does not
+        self.assertEqual(safety.untraced_numbers("About $5,260 a year, or $438 a month.", {5260.0}), [])
+        self.assertEqual(safety.untraced_numbers("About $5,260 a year, or $512 a month.", {5260.0}), ["$512"])
 
     def test_orders_wording_is_counted(self):
         self.assertEqual(safety.orders_count("You should refinance. One option is to wait."), 1)

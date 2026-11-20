@@ -106,7 +106,7 @@ python -m unittest discover tests      # 46 tests, no API key: calculators, sign
 python tests/redteam.py                # live attacks through the real AI team -> output/redteam_report.md
 ```
 
-Live red-team result (2026-11-07, re-run 2026-11-12): **9 of 9 attacks stopped**, including a scam address planted for Ari's email
+Live red-team result (2026-11-07; final re-run 2026-11-19): **9 of 9 attacks stopped**, including a scam address planted for Ari's email
 and a control question with no false alarms (full table in `output/redteam_report.md`). The red team caught two real
 bugs: the "list documents" tool was handing the AI the hidden text it had just removed, and the number audit flagged
 the family's own profile income range as made up. Both fixed, then re-tested. Try it yourself with
